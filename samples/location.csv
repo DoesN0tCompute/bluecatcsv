@@ -1,0 +1,8 @@
+*row_id,*object_type,*action,parent_code,*code,name,description,latitude,longitude
+1,location,create,US NYC,US NYC DC2,NYC Primary Datacenter,Primary datacenter in New York City,40.7128,-74.0060
+2,location,create,US NYC DC2,US NYC DC2 F23,NYC DC2 Floor 23,First floor of NYC datacenter,40.7128,-74.0060
+3,location,create,US NYC DC2,US NYC DC2 F24,NYC DC2 Floor 24,Second floor of NYC datacenter,40.7128,-74.0060
+4,location,create,US SFO,US SFO HQ,San Francisco HQ,San Francisco headquarters,37.7749,-122.4194
+5,location,create,GB LON,GB LON DC3,London Datacenter,Primary datacenter in London,51.5074,-0.1278
+6,location,create,GB LON DC3,GB LON DC3 CAG,London DC3 Cage,Cage in London datacenter,51.5074,-0.1278
+7,location,create,JP TYO,JP TYO OFC,Tokyo Office,Tokyo regional office,35.6762,139.6503

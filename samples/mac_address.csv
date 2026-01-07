@@ -1,0 +1,7 @@
+*row_id,*object_type,*action,*config,*mac_address,name,pool_name
+1,mac_address,create,Default,00:11:22:33:44:55,voip-phone-reception,VoIP-Phones
+2,mac_address,create,Default,00:11:22:33:44:56,voip-phone-conference,VoIP-Phones
+3,mac_address,create,Default,AA:BB:CC:DD:EE:FF,blocked-rogue-device,Blocked-Devices
+4,mac_address,create,Default,11:22:33:44:55:66,laptop-john-doe,Corporate-Laptops
+5,mac_address,create,Default,22:33:44:55:66:77,sensor-temp-001,IoT-Devices
+6,mac_address,create,Default,33:44:55:66:77:88,registered-printer,

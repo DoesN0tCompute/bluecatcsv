@@ -1,0 +1,13 @@
+# Production dependencies only
+# To regenerate: poetry export -f requirements.txt --without dev --output requirements.txt
+#
+# For development dependencies, see requirements-dev.txt
+
+httpx==0.27.2
+pydantic==2.12.5
+tenacity==8.5.0
+diskcache==5.6.3
+structlog==24.4.0
+pyyaml==6.0.3
+typer[all]==0.12.5
+rich==13.9.4

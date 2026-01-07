@@ -1,0 +1,4 @@
+row_id,object_type,action,config,parent,cidr,name,address,mac,description
+block_simple,ip4_block,create,Default,,172.16.200.0/24,Simple-Test-Block,,,Simple test block
+network_simple,ip4_network,create,Default,/IPv4/172.16.200.0/24,172.16.200.0/28,Simple-Test-Network,,,Simple test network
+address_simple,ip4_address,create,Default,/IPv4/172.16.200.0/28,,simple-host,172.16.200.5,00:11:22:33:44:66,Simple test host

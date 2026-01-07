@@ -1,0 +1,3 @@
+*row_id,*object_type,*action,*config,*view_path,*zone_name,name,exchange,preference,ttl,description
+1,mx_record,create,Default,Internal,example.local,example.local,mail.example.local,10,3600,Primary mail exchanger
+2,mx_record,create,Default,Internal,example.local,example.local,mail-backup.example.local,20,3600,Backup mail exchanger

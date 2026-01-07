@@ -1,0 +1,8 @@
+*row_id,*object_type,*action,*config,network_path,name,*code,value,server_scope
+1,dhcpv4_client_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,router,3,"[""10.1.1.1""]",
+2,dhcpv4_client_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,dns-server,6,"[""10.1.1.10"", ""10.1.1.11""]",
+3,dhcpv4_client_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,domain-name,15,example.local,
+4,dhcpv4_client_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,ntp-server,42,"[""10.1.1.12""]",
+5,dhcpv4_client_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,tftp-server-name,66,pxe.example.local,
+6,dhcpv4_client_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,boot-file-name,67,pxelinux.0,
+7,dhcpv4_client_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,domain-search,119,"[""example.local"", ""corp.example.local""]",

@@ -1,0 +1,5 @@
+*row_id,*object_type,*action,*config,*cidr,name,description
+1,ip4_network,create,Default,10.1.1.0/24,Production-Servers,Production server network
+2,ip4_network,create,Default,10.1.2.0/24,Development-Servers,Development server network
+3,ip4_network,create,Default,10.1.10.0/24,Database-Tier,Database server network
+4,ip4_network,create,Default,10.2.1.0/24,Web-Services,Web services network

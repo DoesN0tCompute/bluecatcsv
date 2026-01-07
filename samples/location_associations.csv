@@ -1,0 +1,68 @@
+# Location Association Examples
+#
+# This file demonstrates how to associate locations with resources.
+# The location_code field allows you to associate any resource with a location.
+#
+# USAGE PATTERN:
+# 1. First, create custom locations (or use existing UN/LOCODE locations)
+# 2. Then, create resources with the location_code field set
+#
+# The location_code can reference:
+#   - A UN/LOCODE location (e.g., "US NYC" for New York)
+#   - A custom location created earlier in the same CSV
+#   - An existing custom location in BAM
+
+# ============================================================================
+# STEP 1: Create custom locations under existing UN/LOCODE locations
+# ============================================================================
+*row_id,*object_type,*action,parent_code,*code,name,description,latitude,longitude
+1,location,create,US NYC,US NYC DC1,Primary Datacenter,Primary datacenter in NYC,40.7128,-74.0060
+2,location,create,US NYC,US NYC DC2,DR Datacenter,Disaster recovery datacenter in NYC,40.7580,-73.9855
+3,location,create,US SFO,US SFO HQ,West Coast HQ,West coast headquarters,37.7749,-122.4194
+
+# ============================================================================
+# STEP 2: Create IP4 blocks with location associations
+# ============================================================================
+*row_id,*object_type,*action,*config,parent,*cidr,name,location_code
+10,ip4_block,create,Default,Default/10.0.0.0/8,10.100.0.0/16,NYC-Infrastructure,US NYC DC1
+11,ip4_block,create,Default,Default/10.0.0.0/8,10.200.0.0/16,SFO-Infrastructure,US SFO HQ
+
+# ============================================================================
+# STEP 3: Create IP4 networks with location associations
+# ============================================================================
+*row_id,*object_type,*action,*config,parent,*cidr,name,location_code
+20,ip4_network,create,Default,Default/10.100.0.0/16,10.100.1.0/24,DC1-Management,US NYC DC1
+21,ip4_network,create,Default,Default/10.100.0.0/16,10.100.2.0/24,DC2-Application,US NYC DC2
+22,ip4_network,create,Default,Default/10.200.0.0/16,10.200.1.0/24,SFO-Office,US SFO HQ
+
+# ============================================================================
+# STEP 4: Create IP addresses with location associations
+# ============================================================================
+*row_id,*object_type,*action,*config,address,name,state,location_code
+30,ip4_address,create,Default,10.100.1.1,dc1-core-router,STATIC,US NYC DC1
+31,ip4_address,create,Default,10.100.2.1,dc2-core-router,STATIC,US NYC DC2
+32,ip4_address,create,Default,10.200.1.1,sfo-core-router,STATIC,US SFO HQ
+
+# ============================================================================
+# STEP 5: Create DNS zones with location associations
+# ============================================================================
+*row_id,*object_type,*action,*config,*view_path,*zone_name,deployable,location_code
+40,dns_zone,create,Default,Internal,dc1.example.local,true,US NYC DC1
+41,dns_zone,create,Default,Internal,dc2.example.local,true,US NYC DC2
+42,dns_zone,create,Default,Internal,sfo.example.local,true,US SFO HQ
+
+# ============================================================================
+# STEP 6: Create host records with location associations
+# ============================================================================
+*row_id,*object_type,*action,*config,*view_path,*zone_name,name,addresses,location_code
+50,host_record,create,Default,Internal,dc1.example.local,app-server-01,10.100.1.10,US NYC DC1
+51,host_record,create,Default,Internal,dc1.example.local,app-server-02,10.100.1.11,US NYC DC1
+52,host_record,create,Default,Internal,dc2.example.local,db-server-01,10.100.2.10,US NYC DC2
+53,host_record,create,Default,Internal,sfo.example.local,web-server-01,10.200.1.10,US SFO HQ
+
+# ============================================================================
+# Example: Using existing UN/LOCODE locations directly (no custom location needed)
+# ============================================================================
+*row_id,*object_type,*action,*config,parent,*cidr,name,location_code
+60,ip4_network,create,Default,Default/10.0.0.0/8,10.50.0.0/24,Chicago-Office,US CHI
+61,ip4_network,create,Default,Default/10.0.0.0/8,10.51.0.0/24,London-Office,GB LON

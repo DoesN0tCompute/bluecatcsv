@@ -1,0 +1,2 @@
+row_id,object_type,action,config,network_path,name,role_type,server_group
+1,dhcp_deployment_role,create,Default,192.168.40.0/24,Primary-DHCP-Role,PRIMARY,server1

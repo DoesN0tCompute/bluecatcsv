@@ -1,0 +1,5 @@
+*row_id,*object_type,*action,*config,*name,pool_type
+1,mac_pool,create,Default,VoIP-Phones,MACPool
+2,mac_pool,create,Default,Corporate-Laptops,MACPool
+3,mac_pool,create,Default,Blocked-Devices,MACPool
+4,mac_pool,create,Default,IoT-Devices,MACPool

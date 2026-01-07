@@ -1,0 +1,6 @@
+row_id,object_type,action,user_type,user_name,resource_type,resource_path,config,default_access_level
+1,access_right,delete,user,operator,Configuration,Default,,VIEW
+2,access_right,delete,group,NetworkAdmins,Configuration,Production,,ADD
+3,access_right,delete,user,developer,,,Default,VIEW
+4,access_right,delete,group,DNSTeam,Configuration,Default,,CHANGE
+5,access_right,delete,user,readonly,Configuration,Default,,VIEW

@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,config,parent,cidr,name,udf_CostCenter,udf_Owner,udf_Environment
+1,ip4_network,create,Default,10.0.0.0/8,10.1.0.0/24,Dev-Network,COST-DEV-001,dev-team@example.com,Development
+2,ip4_network,create,Default,10.0.0.0/8,10.2.0.0/24,Prod-Network,COST-PROD-001,ops-team@example.com,Production
+3,ip4_network,create,Default,10.0.0.0/8,10.3.0.0/24,Staging-Network,COST-STG-001,qa-team@example.com,Staging

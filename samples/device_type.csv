@@ -1,0 +1,5 @@
+*row_id,*object_type,*action,name
+1,device_type,create,Fortinet
+2,device_type,create,Palo Alto
+3,device_type,create,Cisco
+4,device_type,create,Custom-Switch

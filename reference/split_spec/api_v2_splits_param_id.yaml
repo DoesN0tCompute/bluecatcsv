@@ -1,0 +1,1534 @@
+openapi: 3.0.1
+info:
+  title: BlueCat Address Manager RESTful v2 API
+  description: 'The **BlueCat Address Manager RESTful v2 API** is a new RESTful API
+    for Address Manager that presents Address Manager objects as resources. Each resource
+    has a unique endpoint, and related resources are grouped in collections. To fetch
+    an individual resource, a `GET` request is sent to the resource''s endpoint. To
+    fetch all resources in a collection, a `GET` request is sent to the collection''s
+    endpoint.
+
+
+    The RESTful v2 API is [hypermedia driven](https://en.wikipedia.org/wiki/HATEOAS)
+    and uses the [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language)
+    format for representing links. When navigating through the API, you can use those
+    links to navigate to related resources or child resources of the requested endpoint.
+    The API supports the following media types for most endpoints:  `application/hal+json`,
+    `application/json`, and `text/csv`.  For authentication, the API supports both
+    `Basic` and `Bearer` HTTP authentication schemes.
+
+
+    To get started, create a session and receive credentials for `Basic` authentication
+    by sending a `POST` request to the [/sessions](#/User%20and%20Group%20Resources/postSession)
+    endpoint, with a message body containing the user''s credentials:
+
+
+    ```{"username":"apiuser", "password":"apipass"}```
+
+
+    The response will contain an `apiToken` field that can be entered with the username
+    in the Swagger UI **Authorize** dialog. The response will also contain a `basicAuthenticationCredentials`
+    field containing a base64 encoding of the requester''s username and API token
+    delimited by a colon. This string can be injected directly into request `Authorization`
+    headers in the following format:
+
+
+    ```Authorization: Basic YXBpOlQ0OExOT3VIRGhDcnVBNEo1bGFES3JuS3hTZC9QK3pjczZXTzBJMDY=```
+
+
+    For full details on API format and authentication methods, refer to the Address
+    Manager RESTful v2 API Guide on the BlueCat Documentation Portal.'
+  termsOfService: https://docs.bluecatnetworks.com/r/Terms-and-Conditions/Terms-and-Conditions
+  contact:
+    name: BlueCat Customer Care
+    url: https://care.bluecatnetworks.com/
+  license:
+    name: BlueCat License Agreements
+    url: https://bluecatnetworks.com/license-agreements/
+  version: 9.6.0
+paths:
+  /api/v2/splits/{id}:
+    get:
+      tags:
+      - IPv4 and IPv6 Resources
+      summary: Retrieve a single split resource
+      description: Retrieve a split IPv4 or IPv6 block or network.
+      operationId: getSplit
+      parameters:
+      - $ref: '#/components/parameters/fields'
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: A split resource
+          content:
+            application/hal+json:
+              schema:
+                allOf:
+                - oneOf:
+                  - $ref: '#/components/schemas/IPv4BlockSplit'
+                  - $ref: '#/components/schemas/IPv4NetworkSplit'
+                - type: object
+                  properties:
+                    _links:
+                      $ref: '#/components/schemas/IPv4BlockSplitResourceLinks'
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/IPv4BlockSplit'
+                - $ref: '#/components/schemas/IPv4NetworkSplit'
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+security:
+- basicAuthentication: []
+- bearerToken: []
+tags:
+- name: Administrator Resources
+  description: Operations for access rights, configurations, imports, password policies,
+    server patches, services, settings,  user-defined field definitions, user-defined
+    link definitions and workflow requests.
+- name: Authenticator Resources
+  description: Operations for authenticators, Kerberos realms, service principals
+    and key distribution centers.
+- name: Database Management and Replication Resources
+  description: Operations for database replication, database backups and trust relationships.
+- name: Deployment Option Resources
+  description: Operations for deployment options, deployment option definitions, access
+    control lists and match elements.
+- name: Deployment Role Resources
+  description: Operations for deployment roles.
+- name: Device Resources
+  description: Operations for devices, device types and subtypes.
+- name: DHCP Resources
+  description: Operations for DHCP client classes and subclasses, DHCP zone groups
+    and zone declarations, DHCP deployment option definitions and  DHCP vendor profiles.
+- name: DNSSEC Resources
+  description: Operations for DNSSEC signing policies and key management, and TSIG
+    zone signing keys.
+- name: IPv4 and IPv6 Resources
+  description: Operations for addresses, blocks, IP groups, leases, networks, DHCP
+    ranges, IP reconciliation policies and discovered devices, and IP templates.
+- name: Location Resources
+  description: Operations for locations and annotated resources
+- name: MAC Address and Client Identifier Resources
+  description: Operations for DHCP client identifiers, DHCP unique identifiers, MAC
+    addresses and MAC address pools.
+- name: Monitoring Resources
+  description: Operations for events, logs, notification groups, reports and report
+    schedules, transactions, and user sessions.
+- name: Resource Record Resources
+  description: Operations for resource records.
+- name: Server Resources
+  description: Operations for deployments and deployment schedules, interfaces, servers,
+    server groups, server services.
+- name: Tag Resources
+  description: Operations for tags, tag groups, and tagged resources.
+- name: TFTP Resources
+  description: Operations for TFTP groups and files.
+- name: User and Group Resources
+  description: Operations for users and groups, favorites and tasks.
+- name: View and Zone Resources
+  description: Operations for resource record naming policies, DNS response policies,
+    zones and zone templates, and views.
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      description: The ID of the resource.
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+    fields:
+      name: fields
+      in: query
+      description: The subset of response resource field paths.
+      required: false
+      schema:
+        type: string
+  schemas:
+    IPv4BlockSplit:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - IPv4BlockSplit
+        transaction:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/Transaction'
+        block:
+          required:
+          - id
+          nullable: false
+          allOf:
+          - $ref: '#/components/schemas/InlinedIPv4Block'
+        splitPointAddress:
+          type: string
+          description: The IP address of the point at which you would like to split
+            the block.
+    IPv4NetworkSplit:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - IPv4NetworkSplit
+        transaction:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/Transaction'
+        network:
+          required:
+          - id
+          nullable: false
+          allOf:
+          - $ref: '#/components/schemas/InlinedIPv4Network'
+        networkCount:
+          maximum: 1024
+          minimum: 2
+          type: integer
+          description: The number of resultant sub-networks after the split.
+          format: int32
+          nullable: false
+        gatewayPreserved:
+          type: boolean
+          description: Indicates whether the gateway address of the original network
+            is kept.
+          writeOnly: true
+        defaultGatewayAssigned:
+          type: boolean
+          description: Indicates whether the first IP address after the network ID
+            is assigned as the default gateway address.
+          writeOnly: true
+        conflictResolutionStrategy:
+          type: string
+          description: The method used to resolve conflicts between template items
+            and the resource the template is applied to.
+          writeOnly: true
+          enum:
+          - USE_EXISTING
+          - OVERWRITE
+        template:
+          required:
+          - id
+          writeOnly: true
+          allOf:
+          - $ref: '#/components/schemas/InlinedIPv4Template'
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 400
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Bad Request
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerConfigurationError
+          - ActiveServerMissingHaBackbone
+          - AddressHasLinkedRecords
+          - AddressIsBroadcastAddress
+          - AddressIsNetworkId
+          - AddressIsNetworkRouterAnycast
+          - AddressIsReserved
+          - AddressNotInNetwork
+          - AddressNotInRestrictedRanges
+          - AddressProtocolMatch
+          - AddressProtocolMismatch
+          - ArrayFieldSizeTooBig
+          - ArrayFieldSizeTooSmall
+          - AuthenticatorMismatch
+          - BlankFieldValue
+          - BrokenMandatoryDependency
+          - BrokenOptionalDependency
+          - CannotAssociateServerAssignedOption
+          - CannotEnableSso
+          - CannotFailoverWhileNodesDisconnected
+          - CannotFetchGroupsFromLdapAuthenticator
+          - ConflictingFieldsList
+          - ConflictingOrderBySortDirections
+          - ConflictingResourceFieldValues
+          - CreateUpdateNetworkGatewayNotSupported
+          - DatabaseNotInReplicatedState
+          - DatabaseReplicationInProgress
+          - DedicatedManagementNotEnabled
+          - DeleteAuthenticatorNotAllowed
+          - DeploymentFailedToStart
+          - DhcpDeploymentValidationNotEnabled
+          - DnsDeploymentValidationNotEnabled
+          - DuplicateFieldValue
+          - DuplicateFilterField
+          - DuplicateOrderByField
+          - DuplicateOrderByOperator
+          - DurationValueNotDivisibleBy
+          - DurationValueOutsideRange
+          - EmptyFieldValue
+          - EmptyRequestBody
+          - FailoverTargetAlreadyPrimaryServer
+          - FieldsParseError
+          - FieldsTokenError
+          - FieldHasPatchOnlyUpdate
+          - FieldNotPatchable
+          - FieldValueTooSmall
+          - FilterNeedsRefinement
+          - FilterParseError
+          - FilterTokenError
+          - ImportInProgress
+          - IncompatibleServerProfile
+          - IncompatibleServerVersion
+          - InterfaceRedundancyConfigurationError
+          - InvalidAnycastAddress
+          - InvalidAsciiString
+          - InvalidCsv
+          - InvalidDateValue
+          - InvalidDnsFeedLicense
+          - InvalidDuidValue
+          - InvalidDurationValue
+          - InvalidEmailAddress
+          - InvalidBase64Value
+          - InvalidEnumValue
+          - InvalidEnumZoneAbsoluteNameLength
+          - InvalidEnumZoneName
+          - InvalidFieldName
+          - InvalidFieldPath
+          - InvalidFileCharacterEncoding
+          - InvalidFileContentDisposition
+          - InvalidFileDataValue
+          - InvalidFilterAddress
+          - InvalidFilterAddressRange
+          - InvalidFilterAddressRangeSize
+          - InvalidFilterCountsAndPercentages
+          - InvalidFilterDate
+          - InvalidFilterEnumValue
+          - InvalidFilterField
+          - InvalidFilterMacAddress
+          - InvalidFilterPartialAddress
+          - InvalidFilterPercentage
+          - InvalidFilterValue
+          - InvalidFilterValueType
+          - InvalidFullyQualifiedDomainName
+          - InvalidFullyQualifiedDomainNameField
+          - InvalidGatewayMountPointValue
+          - InvalidHeaderValue
+          - InvalidInlinedResource
+          - InvalidIpv4AddressValue
+          - InvalidIpv4LoopbackPrefixLength
+          - InvalidIpv4RangeValue
+          - InvalidIpv6AddressValue
+          - InvalidIpv6BlockPrefixLength
+          - InvalidIpv6LoopbackPrefixLength
+          - InvalidIpv6NetworkPrefixLength
+          - InvalidIpv6RangeValue
+          - InvalidIpAddressState
+          - InvalidIpAddressValue
+          - InvalidIpAddressOrFullyQualifiedDomainNameValue
+          - InvalidIpBlockValue
+          - InvalidIpRangeValue
+          - InvalidLdapGroupName
+          - InvalidLimitParameterValue
+          - InvalidLocationCode
+          - InvalidMacAddressValue
+          - InvalidMatchCriteria
+          - InvalidMoveDestination
+          - InvalidNumberZoneAbsoluteNameLength
+          - InvalidNtpServerAddressForStratum
+          - InvalidOffsetParameterValue
+          - InvalidPaginationParameter
+          - InvalidPartialMacAddressFilter
+          - InvalidPolicyItemNameValue
+          - InvalidPrivateKeyValue
+          - InvalidQueryParameterValue
+          - InvalidRegularExpression
+          - InvalidResourceFieldValue
+          - InvalidResourceId
+          - InvalidResourceRecordData
+          - InvalidResourceType
+          - InvalidRetentionRestrictions
+          - InvalidServerPatchFile
+          - InvalidSplitPointAddress
+          - InvalidStartEndDates
+          - InvalidStringCharacters
+          - InvalidStringFieldPrefix
+          - InvalidTrustRelationshipCredentials
+          - InvalidTopLevelMerge
+          - InvalidTtlValue
+          - InvalidUdfDateValue
+          - InvalidUdfDefaultValue
+          - InvalidUdfEmailValue
+          - InvalidUdfNumberValue
+          - InvalidUdfPredefinedValue
+          - InvalidUdfPredefinedValues
+          - InvalidUdfUrlValue
+          - InvalidUdfValidationProperties
+          - InvalidUdfValue
+          - InvalidUidValue
+          - InvalidUndoTransactionId
+          - InvalidUrlScheme
+          - InvalidUrlValue
+          - InvalidX509CertificateValue
+          - InvalidZoneName
+          - IpRangeBroadcastOrNetworkIdAssigned
+          - IpRangeDoesNotOverlap
+          - IpRangeExcludesAssignedAddresses
+          - IpRangeExcludesChildRanges
+          - IpRangeExcludesDhcpRanges
+          - IpRangeExcludesGateway
+          - IpRangeIncludesGateway
+          - IpRangeNotAlignedOnRangeBoundary
+          - IpRangeOutsideNetworkBlockBoundary
+          - IpRangeOutsideParent
+          - IpRangeOverlapsSiblings
+          - IpRangeOverlapsRangeInOtherConfiguration
+          - IpRangePartiallyIncludesChildRanges
+          - IpRangeTooBig
+          - IpRangeTooSmall
+          - JsonDeserializationError
+          - JsonParseError
+          - JsonFieldParseError
+          - MacAddressInUse
+          - MismatchedLocationCodeParent
+          - MismatchedManagementAndServicesInterfaces
+          - MismatchedMergeTypes
+          - MissingMandatoryChangeControlComment
+          - MissingMergeDestinationInSiblings
+          - MissingPatchableField
+          - MissingQueryParameter
+          - MissingRequiredDeploymentRoleInterface
+          - MissingRequiredField
+          - MissingRequiredFilterField
+          - MissingRequiredFilterPredicate
+          - MoveAddressUnsupportedState
+          - MoveRolesWithOptionsOnServer
+          - MultipleBgpNeighborsNotSupported
+          - MultipleQueryParameterValues
+          - MultipleValuesNotAllowed
+          - NamingPolicyViolation
+          - NamingPolicyRestrictionViolation
+          - NetworkInterfaceNotConfigured
+          - NothingToDeployForUser
+          - NoAssignedDeploymentRoles
+          - NoHsmConfiguration
+          - NoKeyDistributionCentersInRealm
+          - NoPreviousFullDeploymentForDifferential
+          - NoSpaceForAddress
+          - NoSpaceForBlock
+          - NoSpaceForNetwork
+          - NoSpaceForRange
+          - OrderByParseError
+          - OrderByTokenError
+          - PaginationNotSupported
+          - PassiveServerConfigurationError
+          - PassiveServerMissingHaBackbone
+          - PasswordFailedRequirements
+          - RedirectPolicyTypeDisabled
+          - ReplicatedServerLimitReached
+          - ReplicationOperationNotAllowed
+          - ResetServerServicesRequired
+          - ResourceFieldNotInConfiguration
+          - ResourceFieldNotInRestrictedZones
+          - ResourceHasCircularReference
+          - ResourceHasRecordsNotInZone
+          - ResourceNotInConfiguration
+          - ResourceNotInRestrictedZones
+          - ResourceNotInTemplate
+          - ResourceNotInView
+          - ServerCommandError
+          - ServerControlResetRequired
+          - ServerGroupNotMultiPrimary
+          - ServerGroupSizeLimitReached
+          - ServerHasAssignedDeploymentOptions
+          - ServerHasAssignedDeploymentRoles
+          - ServerIsDeploying
+          - ServerIsMultiPrimaryServerGroupMember
+          - ServerIsPassive
+          - ServerManagementAddressProtocolMismatch
+          - ServerNotActive
+          - ServerNotDisabled
+          - ServerNotManaged
+          - ServerNotStandaloneServer
+          - ServerNotTrusted
+          - ServerServiceInterfaceNameMismatch
+          - ServerSslHandshakeError
+          - SigningPolicyInUse
+          - SsoEnforcementRequirementsUnmet
+          - StringFieldTooBig
+          - StringFieldTooSmall
+          - TemplateApplicationFailedToStart
+          - TemplateNotAssigned
+          - TotalCountNotSupported
+          - TrustRelationshipLimitReached
+          - UdfPredefinedValueInUse
+          - UdfValidationPropertiesInUse
+          - UdfValueExceedsMaximumLength
+          - UdfValueLessThanMinimum
+          - UdfValueLessThanMinimumLength
+          - UdfValueOutsideRange
+          - UnsupportedAggregateOperator
+          - UnsupportedAggregateFilterOperator
+          - UnsupportedDeploymentOptionScope
+          - UnsupportedDeploymentRoleInterfaceType
+          - UnsupportedEmbeddableCollection
+          - UnsupportedEmbeddableResource
+          - UnsupportedFieldsOperatorForMediaType
+          - UnsupportedFilterOperator
+          - UnsupportedFilterOperatorForNullValue
+          - UnsupportedHeaderEncoding
+          - UnsupportedHeaderValue
+          - UnsupportedImportFileType
+          - UnsupportedMultiPrimaryDeploymentOption
+          - UnsupportedOrderByField
+          - UnsupportedOrderByOperator
+          - UnsupportedResourceFieldValue
+          - UnsupportedResourceType
+          - UnsupportedServerCommand
+          - ValueLessThanMinimum
+          - ValueOutsideRange
+          - WorkflowRequestNotPending
+          - WrongCsvRowFieldCount
+          - WrongResourceType
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 403
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Forbidden
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - AccessDenied
+          - CreateNotAllowed
+          - DeleteLastLinkNotAllowed
+          - DeleteLastStandbyServerNotAllowed
+          - DeleteNotAllowed
+          - DisableHaServerServiceNotSupported
+          - EnableHaServerServiceNotSupported
+          - FieldUpdateNotAllowed
+          - FileSizeTooBig
+          - InvalidAuthorizationScheme
+          - OperationNotPermitted
+          - ReadOnlySession
+          - ReadOnlySessionOnPrimary
+          - ResourceInUse
+          - ServerIsF5PoolMember
+          - ServerInReplication
+          - UpdateNotAllowed
+          - WorkflowRequestApproveDenyNotAllowed
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    IPv4BlockSplitResourceLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /splits/12345
+          nullable: false
+          readOnly: true
+        collection:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /splits
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 401
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Unauthorized
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - InvalidAuthorizationCredentials
+          - InvalidServerPassword
+          - InvalidUsernameOrApiKey
+          - InvalidUsernameOrPassword
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 404
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Not Found
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerNotConnected
+          - CannotConnectToServer
+          - InlinedResourceNotFound
+          - NetworkNotFoundForAddress
+          - PassiveServerNotConnected
+          - ResourceNotFound
+          - ResourceFieldNotFound
+          - ServerGroupHasNoMembers
+          - ServerNotConnected
+          - ServerServiceInterfaceNotConnected
+          - WrongResourceCollection
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    InlinedIPv4Block:
+      title: IPv4Block
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The type of IP block.
+          enum:
+          - IPv4Block
+        name:
+          type: string
+          description: The name of the resource.
+          example: name
+    Transaction:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - Transaction
+        transactionType:
+          type: string
+          description: The type of transaction performed.
+          nullable: false
+          enum:
+          - UNDO
+        operation:
+          type: string
+          description: The operation performed.
+          readOnly: true
+          enum:
+          - ADD_AAAA_RECORD
+          - ADD_ACCESS_RIGHT
+          - ADD_ACL
+          - ADD_ADMINISTRATIVE_ACCESS_RIGHTS
+          - ADD_ALIAS_RECORD
+          - ADD_A_RECORD
+          - ADD_CONFIGURATION
+          - ADD_CUSTOM_DHCPV4_CLIENT_OPTION
+          - ADD_CUSTOM_DHCPV4_CLIENT_OPTION_DEFINITION
+          - ADD_DEPLOYMENT_OPTION_VALUE
+          - ADD_DEPLOYMENT_SCHEDULER
+          - ADD_DEVICE
+          - ADD_DEVICE_INSTANCE
+          - ADD_DEVICE_SUBTYPE
+          - ADD_DEVICE_TYPE
+          - ADD_DHCPV4_CLIENT_CLASS
+          - ADD_DHCPV4_CLIENT_OPTION
+          - ADD_DHCPV4_CLIENT_SUBCLASS
+          - ADD_DHCPV4_RAW_OPTION
+          - ADD_DHCPV4_SERVICE_OPTION
+          - ADD_DHCPV6_CLIENT_OPTION
+          - ADD_DHCPV6_RAW_OPTION
+          - ADD_DHCPV6_SERVICE_OPTION
+          - ADD_DHCP_DEPLOYMENT_ROLE
+          - ADD_DHCP_ZONE_GROUP
+          - ADD_DNS64
+          - ADD_DNSSEC_SIGNING_POLICY
+          - ADD_DNS_DEPLOYMENT_ROLE
+          - ADD_DNS_OPTION
+          - ADD_DNS_RAW_OPTION
+          - ADD_E164_ZONE
+          - ADD_EXTERNAL_HOST_RECORD
+          - ADD_FORWARD_DHCP_ZONE
+          - ADD_GENERIC_RECORD
+          - ADD_GTM_SERVER
+          - ADD_HA_SERVER
+          - ADD_HINFO_RECORD
+          - ADD_HOST_RECORD
+          - ADD_HSM_CONFIGURATION
+          - ADD_HSM_SERVER
+          - ADD_HTTPS_RECORD
+          - ADD_INTERNAL_ROOT_ZONE
+          - ADD_IPV4_BLOCK
+          - ADD_IPV4_DHCP_RANGE
+          - ADD_IPV4_GROUP
+          - ADD_IPV4_NETWORK
+          - ADD_IPV4_PARENT
+          - ADD_IPV4_RECONCILIATION_POLICY
+          - ADD_IPV4_TEMPLATE
+          - ADD_IPV6_ADDRESS
+          - ADD_IPV6_ADDRESS_HOST
+          - ADD_IPV6_DHCP_RANGE
+          - ADD_IPV6_GLOBAL_ADDRESS_BLOCK
+          - ADD_IPV6_NETWORK
+          - ADD_IPV6_PARENT
+          - ADD_IPV6_RECONCILIATION_POLICY
+          - ADD_IPV6_TEMPLATE
+          - ADD_KDC
+          - ADD_KERBEROS_AUTHENTICATOR
+          - ADD_KERBEROS_REALM
+          - ADD_KEY_SIGNING_KEY
+          - ADD_LDAP_AUTHENTICATOR
+          - ADD_LDAP_GROUP
+          - ADD_LOCATION
+          - ADD_LTM_SERVER
+          - ADD_MAC_ADDRESS
+          - ADD_MAC_ADDRESS_TO_MAC_POOL
+          - ADD_MAC_POOL
+          - ADD_MX_RECORD
+          - ADD_NAMING_POLICY
+          - ADD_NAMING_POLICY_VALUE_CONNECTOR
+          - ADD_NAMING_POLICY_VALUE_INCREMENTAL
+          - ADD_NAMING_POLICY_VALUE_INTEGER
+          - ADD_NAMING_POLICY_VALUE_REQUIRED
+          - ADD_NAMING_POLICY_VALUE_TEXT
+          - ADD_NAMING_RESTRICTION
+          - ADD_NAPTR_RECORD
+          - ADD_NAPTR_RECORD_GROUP
+          - ADD_NOTIFICATION_GROUP
+          - ADD_NOTIFICATION_GROUP_USERS_OR_GROUPS
+          - ADD_OAUTH_SERVER
+          - ADD_RADIUS_AUTHENTICATOR
+          - ADD_REPORT
+          - ADD_REPORT_SCHEDULER
+          - ADD_RESOURCE
+          - ADD_RESOURCE_COLLECTOR
+          - ADD_RESOURCE_LINK
+          - ADD_RESPONSE_POLICY
+          - ADD_RESPONSE_POLICY_ZONE
+          - ADD_REVERSE_DHCP_ZONE
+          - ADD_SAML_IDENTITY_PROVIDER
+          - ADD_SAML_SERVICE_PROVIDER
+          - ADD_SAML_SERVICE_PROVIDER_METADATA
+          - ADD_SERVER
+          - ADD_SERVER_GROUP
+          - ADD_SERVER_NETWORK_INTERFACE
+          - ADD_SERVER_PATCH_HISTORY
+          - ADD_SERVER_PATCH_INFO
+          - ADD_SERVER_PUBLISHED_INTERFACE
+          - ADD_SERVER_TO_GTM_SERVER_RESOURCE_POOL
+          - ADD_SERVER_TO_LTM_SERVER_RESOURCE_POOL
+          - ADD_SERVER_TO_SERVER_GROUP
+          - ADD_SERVER_VERSION_HISTORY
+          - ADD_SERVER_VIRTUAL_INTERFACE
+          - ADD_SERVICE_PRINCIPAL
+          - ADD_SRV_RECORD
+          - ADD_SSO_GROUP
+          - ADD_START_OF_AUTHORITY
+          - ADD_SVCB_RECORD
+          - ADD_TACACSPLUS_AUTHENTICATOR
+          - ADD_TACACSPLUS_GROUP
+          - ADD_TAG
+          - ADD_TAG_GROUP
+          - ADD_TAG_LINKS
+          - ADD_TASK
+          - ADD_TFTP_DEPLOYMENT_ROLE
+          - ADD_TFTP_FILE
+          - ADD_TFTP_FOLDER
+          - ADD_TFTP_GROUP
+          - ADD_TSIG_KEY
+          - ADD_TXT_RECORD
+          - ADD_URI_RECORD
+          - ADD_USER
+          - ADD_USERS_TO_GROUPS
+          - ADD_USER_DEFINED_FIELD_DEFINITION
+          - ADD_USER_DEFINED_LINK_DEFINITION
+          - ADD_USER_GROUP
+          - ADD_USER_MAC_POOL
+          - ADD_VENDOR_CLIENT_OPTION
+          - ADD_VENDOR_OPTION_DEFINITION
+          - ADD_VENDOR_PROFILE
+          - ADD_VIEW
+          - ADD_WINDOWS_DHCP_FAILOVER_DEPLOYMENT_ROLE
+          - ADD_X509_AUTHENTICATOR
+          - ADD_ZONE
+          - ADD_ZONE_SIGNING_KEY
+          - ADD_ZONE_TEMPLATE
+          - APPLY_ADDRESS_MANAGER_UPDATE
+          - APPLY_IPV4_TEMPLATE
+          - APPLY_NAMING_POLICY
+          - APPLY_SIGNING_POLICY
+          - APPROVE_ADD_ALIAS_RECORD
+          - APPROVE_ADD_HOST_RECORD
+          - APPROVE_ADD_IPV4_NETWORK
+          - APPROVE_ADD_RESOURCE_RECORD
+          - APPROVE_ADD_ZONE
+          - APPROVE_ASSIGN_IPV4_ADDRESS
+          - APPROVE_ASSIGN_IPV4_ADDRESS_WITH_PTR
+          - APPROVE_CHANGE_IPV4_STATE
+          - APPROVE_DELETE_RESOURCE
+          - APPROVE_RENAME_RESOURCE_RECORD
+          - APPROVE_UPDATE_ALIAS_RECORD
+          - APPROVE_UPDATE_HOST_RECORD
+          - APPROVE_UPDATE_IPV4_ADDRESS
+          - APPROVE_UPDATE_IPV4_NETWORK
+          - APPROVE_UPDATE_READONLY_IPV4_NETWORK
+          - APPROVE_UPDATE_RESOURCE_RECORD
+          - APPROVE_UPDATE_ZONE
+          - ASSIGN_IPV4_ADDRESS
+          - ASSIGN_IPV4_TEMPLATE
+          - ASSIGN_IPV6_ADDRESS
+          - ASSIGN_NEXT_AVAILABLE_IPV4_ADDRESS
+          - BREAK_HA_SERVER
+          - BULK_DNS_UPDATE
+          - CHANGE_IPV4_ADDRESS_STATE
+          - CLEANUP_DHCP_DEPLOYMENT_ROLE
+          - CLEANUP_DHCP_SETTINGS
+          - CLEANUP_MISMATCHED_RESOURCES
+          - CLEAR_IPV6_ADDRESS_ASSIGNMENT
+          - CLEAR_SERVER_DNS_CACHE
+          - CLEAR_SERVER_DNS_CACHE_DOMAIN_ONLY
+          - CLEAR_SERVER_DNS_CACHE_HOSTNAME_ONLY
+          - CONFIGURE_ADDRESS_MANAGER_NTP_SERVICE
+          - CONFIGURE_ADDRESS_MANAGER_SNMP_SERVICE
+          - CONFIGURE_ADDRESS_MANAGER_SYSLOG_SERVICE
+          - CONFIGURE_SERVER_ADDITIONAL_IP_ADDRESSES_SERVICE
+          - CONFIGURE_SERVER_ANYCAST_SERVICE
+          - CONFIGURE_SERVER_COLLECTOR_SERVICE
+          - CONFIGURE_SERVER_FIREWALL_SERVICE
+          - CONFIGURE_SERVER_NTP_SERVICE
+          - CONFIGURE_SERVER_SNMP_SERVICE
+          - CONFIGURE_SERVER_SSH_SERVICE
+          - CONFIGURE_SERVER_SYSLOG_SERVICE
+          - CONNECT_SERVER
+          - COPY_RESOURCES
+          - DATA_ARCHIVE_OR_PURGE_TASK
+          - DELETE_AAAA_RECORD
+          - DELETE_ACCESS_RIGHT
+          - DELETE_ACL
+          - DELETE_ADMINISTRATIVE_ACCESS_RIGHT
+          - DELETE_ALIAS_RECORD
+          - DELETE_APPROVED_AND_DENIED_WORKFLOW_REQUESTS
+          - DELETE_A_RECORD
+          - DELETE_COLLECTOR
+          - DELETE_CONFIGURATION
+          - DELETE_CUSTOM_DHCPV4_CLIENT_OPTION_DEFINITION
+          - DELETE_DEPLOYMENT_SCHEDULER
+          - DELETE_DEVICE
+          - DELETE_DEVICE_INSTANCE
+          - DELETE_DEVICE_SUBTYPE
+          - DELETE_DEVICE_TYPE
+          - DELETE_DHCPV4_CLIENT_CLASS
+          - DELETE_DHCPV4_CLIENT_OPTION
+          - DELETE_DHCPV4_CLIENT_SUBCLASS
+          - DELETE_DHCPV4_RAW_OPTION
+          - DELETE_DHCPV4_SERVICE_OPTION
+          - DELETE_DHCPV6_CLIENT_OPTION
+          - DELETE_DHCPV6_RAW_OPTION
+          - DELETE_DHCPV6_SERVICE_OPTION
+          - DELETE_DHCP_DEPLOYMENT_ROLE
+          - DELETE_DHCP_ZONE_GROUP
+          - DELETE_DNS64
+          - DELETE_DNSSEC_SIGNING_POLICY
+          - DELETE_DNS_DEPLOYMENT_ROLE
+          - DELETE_DNS_OPTION
+          - DELETE_DNS_RAW_OPTION
+          - DELETE_DYNAMIC_ALIAS_RECORD
+          - DELETE_DYNAMIC_GENERIC_RECORD
+          - DELETE_DYNAMIC_HINFO_RECORD
+          - DELETE_DYNAMIC_HOST_RECORD
+          - DELETE_DYNAMIC_HTTPS_RECORD
+          - DELETE_DYNAMIC_MX_RECORD
+          - DELETE_DYNAMIC_NAPTR_RECORD
+          - DELETE_DYNAMIC_RECORD
+          - DELETE_DYNAMIC_SRV_RECORD
+          - DELETE_DYNAMIC_SVCB_RECORD
+          - DELETE_DYNAMIC_TXT_RECORD
+          - DELETE_DYNAMIC_URI_RECORD
+          - DELETE_E164_ZONE
+          - DELETE_ENTRUST_KEY_SIGNING_KEY
+          - DELETE_ENTRUST_ZONE_SIGNING_KEY
+          - DELETE_ERROR_ENTRY
+          - DELETE_EXTERNAL_HOST_RECORD
+          - DELETE_FORWARD_DHCP_ZONE
+          - DELETE_GENERIC_RECORD
+          - DELETE_GTM_SERVER
+          - DELETE_HINFO_RECORD
+          - DELETE_HOST_RECORD
+          - DELETE_HSM_CONFIGURATION
+          - DELETE_HSM_SERVER
+          - DELETE_HTTPS_RECORD
+          - DELETE_INTERNAL_ROOT_ZONE
+          - DELETE_IPV4_ADDRESS
+          - DELETE_IPV4_BLOCK
+          - DELETE_IPV4_DHCP_RANGE
+          - DELETE_IPV4_GROUP
+          - DELETE_IPV4_NETWORK
+          - DELETE_IPV4_RECONCILIATION_ADDRESSES
+          - DELETE_IPV4_RECONCILIATION_POLICY
+          - DELETE_IPV4_TEMPLATE
+          - DELETE_IPV6_ADDRESS
+          - DELETE_IPV6_BLOCK
+          - DELETE_IPV6_DHCP_RANGE
+          - DELETE_IPV6_NETWORK
+          - DELETE_IPV6_RECONCILIATION_ADDRESSES
+          - DELETE_IPV6_RECONCILIATION_POLICY
+          - DELETE_IPV6_TEMPLATE
+          - DELETE_KDC
+          - DELETE_KERBEROS_AUTHENTICATOR
+          - DELETE_KERBEROS_REALM
+          - DELETE_KEY_SIGNING_KEY
+          - DELETE_LDAP_AUTHENTICATOR
+          - DELETE_LOCATION
+          - DELETE_LTM_SERVER
+          - DELETE_MAC_ADDRESS
+          - DELETE_MAC_ADDRESS_FROM_MAC_POOL
+          - DELETE_MX_RECORD
+          - DELETE_NAMING_POLICY
+          - DELETE_NAMING_POLICY_VALUE_CONNECTOR
+          - DELETE_NAMING_POLICY_VALUE_INCREMENTAL
+          - DELETE_NAMING_POLICY_VALUE_INTEGER
+          - DELETE_NAMING_POLICY_VALUE_REQUIRED
+          - DELETE_NAMING_POLICY_VALUE_TEXT
+          - DELETE_NAMING_RESTRICTION
+          - DELETE_NAPTR_RECORD
+          - DELETE_NAPTR_RECORD_GROUP
+          - DELETE_NOTIFICATION_GROUP
+          - DELETE_RADIUS_AUTHENTICATOR
+          - DELETE_REPORT
+          - DELETE_REPORT_SCHEDULER
+          - DELETE_RESOURCE
+          - DELETE_RESOURCE_LINK
+          - DELETE_RESPONSE_POLICY
+          - DELETE_RESPONSE_POLICY_ZONE
+          - DELETE_REVERSE_DHCP_ZONE
+          - DELETE_SERVER
+          - DELETE_SERVER_FROM_SERVER_GROUP
+          - DELETE_SERVER_GROUP
+          - DELETE_SERVER_PUBLISHED_INTERFACE
+          - DELETE_SERVICE_PRINCIPAL
+          - DELETE_SRV_RECORD
+          - DELETE_START_OF_AUTHORITY
+          - DELETE_SVCB_RECORD
+          - DELETE_TACACSPLUS_AUTHENTICATOR
+          - DELETE_TAG
+          - DELETE_TAG_GROUP
+          - DELETE_TASK
+          - DELETE_TFTP_DEPLOYMENT_ROLE
+          - DELETE_TFTP_FILE
+          - DELETE_TFTP_FOLDER
+          - DELETE_TFTP_GROUP
+          - DELETE_TSIG_KEY
+          - DELETE_TXT_RECORD
+          - DELETE_UNIMPORTED_ZONES
+          - DELETE_URI_RECORD
+          - DELETE_USER
+          - DELETE_USER_DEFINED_FIELD_DEFINITION
+          - DELETE_USER_DEFINED_LINK_DEFINITION
+          - DELETE_USER_FROM_GROUP
+          - DELETE_USER_GROUP
+          - DELETE_USER_MAC_POOL
+          - DELETE_VENDOR_CLIENT_OPTION
+          - DELETE_VENDOR_OPTION_DEFINITION
+          - DELETE_VENDOR_PROFILE
+          - DELETE_VIEW
+          - DELETE_WORKFLOW_REQUEST
+          - DELETE_X509_AUTHENTICATOR
+          - DELETE_ZONE
+          - DELETE_ZONE_SIGNING_KEY
+          - DELETE_ZONE_TEMPLATE
+          - DENY_ADD_ALIAS_RECORD
+          - DENY_ADD_HOST_RECORD
+          - DENY_ADD_IPV4_NETWORK
+          - DENY_ADD_RESOURCE_RECORD
+          - DENY_ADD_ZONE
+          - DENY_ASSIGN_IPV4_ADDRESS
+          - DENY_ASSIGN_IPV4_ADDRESS_WITH_PTR
+          - DENY_CHANGE_IPV4_STATE
+          - DENY_DELETE_RESOURCE
+          - DENY_RENAME_RESOURCE_RECORD
+          - DENY_UPDATE_ALIAS_RECORD
+          - DENY_UPDATE_HOST_RECORD
+          - DENY_UPDATE_IPV4_ADDRESS
+          - DENY_UPDATE_IPV4_NETWORK
+          - DENY_UPDATE_READONLY_IPV4_NETWORK
+          - DENY_UPDATE_RESOURCE_RECORD
+          - DENY_UPDATE_ZONE
+          - DEPLOY_SERVER
+          - DHCP_DYNAMIC_UPDATE_OPERATION
+          - DISABLE_AUTOVACUUM_SERVICE
+          - DNS_DYNAMIC_ADD_OPERATION
+          - DNS_DYNAMIC_DELETE_OPERATION
+          - DNS_DYNAMIC_UPDATE_OPERATION
+          - DUPLICATE_FORWARD_DHCP_ZONE
+          - DUPLICATE_IPV4_BLOCK
+          - DUPLICATE_IPV4_NETWORK
+          - DUPLICATE_RESOURCE_RECORD
+          - DUPLICATE_REVERSE_DHCP_ZONE
+          - ELECT_AD_PRIMARY_DEPLOYMENT_ROLES
+          - ENABLE_AUTOVACUUM_SERVICE
+          - ENABLE_HSM_SUPPORT
+          - FAILOVER_HA_SERVER
+          - GENERATE_DNSSEC_KEY
+          - GET_HA_SERVER_STATUS
+          - GET_SERVER_INFO
+          - IMPORT_CONFIGURATION
+          - IMPORT_ENTITIES
+          - IMPORT_ZONE
+          - INITIALIZE_ADDRESS_MANAGER
+          - INITIALIZE_ADDRESS_MANAGER_LOCALES
+          - JOIN_SECURITY_WORLD
+          - LOCK_OUT_USER
+          - LOCK_OUT_USER_ROLLBACK
+          - MERGE_DUPLICATE_HOST_RECORDS
+          - MERGE_IPV4_BLOCKS
+          - MERGE_IPV4_BLOCK_WITH_PARENT
+          - MERGE_IPV4_DHCP_RANGES
+          - MERGE_IPV4_NETWORKS
+          - MIGRATE_AUTO_CREATE
+          - MIGRATE_BATCH
+          - MOVE_DEPLOYMENT_ROLES
+          - MOVE_IPV4_ADDRESS
+          - MOVE_IPV4_BLOCK
+          - MOVE_IPV4_NETWORK
+          - MOVE_IPV6_ADDRESS_ASSIGNMENT
+          - MOVE_IPV6_BLOCK
+          - MOVE_IPV6_NETWORK
+          - MOVE_RESOURCE_RECORD
+          - MOVE_TFTP_FILE_OR_FOLDER
+          - MOVE_ZONE
+          - PARTITION_IPV6_BLOCK
+          - PARTITION_TO_BLOCKS
+          - PARTITION_TO_NETWORKS
+          - PATCH_ADDRESS_MANAGER
+          - PATCH_SERVER
+          - POPULATE_ZONE
+          - PROCESS_OAUTH_TOKEN
+          - PROCESS_SAML_RESPONSE
+          - QUERY_SERVER_FOR_HOSTNAME
+          - REAPPLY_IPV4_TEMPLATE
+          - REAPPLY_ZONE_TEMPLATE
+          - RECONCILE_IPV4_ADDRESSES
+          - RECONCILE_IPV4_DHCP_RANGE
+          - RECONCILE_IPV4_NETWORK
+          - RECONCILE_IPV6_ADDRESSES
+          - RECONCILE_SERVER
+          - RECONCILE_VIEW
+          - RECONCILE_ZONE
+          - RECORD_SERVER_DEPLOYMENT_EVENT
+          - REMOVE_DNSSEC_SIGNING_POLICY
+          - REMOVE_DUID_FROM_IPV6_ADDRESS
+          - REMOVE_RESOURCE_LINK
+          - REMOVE_RESOURCE_LOCATION
+          - REMOVE_TAG
+          - RENAME_ALIAS_RECORD
+          - RENAME_GENERIC_RECORD
+          - RENAME_HINFO_RECORD
+          - RENAME_HOST_RECORD
+          - RENAME_HTTPS_RECORD
+          - RENAME_MX_RECORD
+          - RENAME_NAPTR_RECORD
+          - RENAME_SRV_RECORD
+          - RENAME_SVCB_RECORD
+          - RENAME_TXT_RECORD
+          - RENAME_URI_RECORD
+          - REPAIR_HA_SERVER
+          - REPLACE_SERVER
+          - REPLACE_TFTP_FILE
+          - REQUEST_ADD_ALIAS_RECORD
+          - REQUEST_ADD_HOST_RECORD
+          - REQUEST_ADD_IPV4_NETWORK
+          - REQUEST_ADD_RESOURCE_RECORD
+          - REQUEST_ADD_ZONE
+          - REQUEST_ASSIGN_IPV4_ADDRESS
+          - REQUEST_ASSIGN_IPV4_ADDRESS_WITH_PTR
+          - REQUEST_ASSIGN_NEXT_AVAILABLE_IPV4_ADDRESS
+          - REQUEST_CHANGE_IPV4_STATE
+          - REQUEST_DELETE_RESOURCE
+          - REQUEST_RENAME_RESOURCE_RECORD
+          - REQUEST_UPDATE_ALIAS_RECORD
+          - REQUEST_UPDATE_HOST_RECORD
+          - REQUEST_UPDATE_IPV4_ADDRESS
+          - REQUEST_UPDATE_IPV4_NETWORK
+          - REQUEST_UPDATE_READONLY_IPV4_NETWORK
+          - REQUEST_UPDATE_RESOURCE_RECORD
+          - REQUEST_UPDATE_ZONE
+          - RESET_SERVER_PASSWORD
+          - RESIZE_IPV4_BLOCK
+          - RESIZE_IPV4_NETWORK
+          - RESIZE_IPV6_BLOCK
+          - RESIZE_IPV6_NETWORK
+          - RESTORE_RESOURCE
+          - SPLIT_IPV4_BLOCK
+          - SPLIT_IPV4_NETWORK
+          - SPLIT_IPV6_BLOCK
+          - SPLIT_IPV6_NETWORK
+          - START_WINDOWS_READONLY_DNS_DEPLOYMENT
+          - UNASSIGN_IPV4_TEMPLATE
+          - UPDATE_ACCESS_RIGHT
+          - UPDATE_ACL
+          - UPDATE_ADMINISTRATIVE_ACCESS_RIGHT
+          - UPDATE_ALIAS_RECORD
+          - UPDATE_COLLECTOR
+          - UPDATE_CONFIGURATION
+          - UPDATE_CONFIGURATION_DNS_OPTION_INHERITANCE_SETTINGS
+          - UPDATE_CUSTOM_DHCPV4_CLIENT_OPTION_DEFINITION
+          - UPDATE_DEPLOYMENT_SCHEDULER
+          - UPDATE_DEVICE
+          - UPDATE_DEVICE_SUBTYPE
+          - UPDATE_DEVICE_TYPE
+          - UPDATE_DHCPV4_CLIENT_CLASS
+          - UPDATE_DHCPV4_CLIENT_OPTION
+          - UPDATE_DHCPV4_CLIENT_SUBCLASS
+          - UPDATE_DHCPV4_RAW_OPTION
+          - UPDATE_DHCPV4_SERVICE_OPTION
+          - UPDATE_DHCPV6_CLIENT_OPTION
+          - UPDATE_DHCPV6_RAW_OPTION
+          - UPDATE_DHCPV6_SERVICE_OPTION
+          - UPDATE_DHCP_DEPLOYMENT_ROLE
+          - UPDATE_DHCP_RECONCILIATION
+          - UPDATE_DHCP_ZONE_GROUP
+          - UPDATE_DNS64
+          - UPDATE_DNSSEC_SIGNING_POLICY
+          - UPDATE_DNS_DEPLOYMENT_ROLE
+          - UPDATE_DNS_OPTION
+          - UPDATE_DNS_RAW_OPTION
+          - UPDATE_DYNAMIC_ALIAS_RECORD
+          - UPDATE_DYNAMIC_HINFO_RECORD
+          - UPDATE_DYNAMIC_HTTPS_RECORD
+          - UPDATE_DYNAMIC_MX_RECORD
+          - UPDATE_DYNAMIC_NAPTR_RECORD
+          - UPDATE_DYNAMIC_SRV_RECORD
+          - UPDATE_DYNAMIC_SVCB_RECORD
+          - UPDATE_DYNAMIC_TXT_RECORD
+          - UPDATE_DYNAMIC_URI_RECORD
+          - UPDATE_E164_ZONE
+          - UPDATE_ENTRUST_KEY_SIGNING_KEY
+          - UPDATE_ENTRUST_KEY_SIGNING_KEY_LIST
+          - UPDATE_ENTRUST_ZONE_SIGNING_KEY
+          - UPDATE_EXTERNAL_HOST_RECORD
+          - UPDATE_FORWARD_DHCP_ZONE
+          - UPDATE_GENERIC_RECORD
+          - UPDATE_GLOBAL_SETTINGS
+          - UPDATE_GTM_SERVER
+          - UPDATE_GTM_SERVER_RESOURCE_GROUP
+          - UPDATE_HA_SERVER
+          - UPDATE_HINFO_RECORD
+          - UPDATE_HOST_RECORD
+          - UPDATE_HSM_CONFIGURATION
+          - UPDATE_HSM_SERVER
+          - UPDATE_HTTPS_RECORD
+          - UPDATE_INTERNAL_ROOT_ZONE
+          - UPDATE_IPV4_ADDRESS
+          - UPDATE_IPV4_BLOCK
+          - UPDATE_IPV4_DHCP_RANGE
+          - UPDATE_IPV4_GROUP
+          - UPDATE_IPV4_NETWORK
+          - UPDATE_IPV4_RECONCILIATION_POLICY
+          - UPDATE_IPV4_TEMPLATE
+          - UPDATE_IPV6_ADDRESS
+          - UPDATE_IPV6_ADDRESS_DUID
+          - UPDATE_IPV6_BLOCK
+          - UPDATE_IPV6_DHCP_RANGE
+          - UPDATE_IPV6_NETWORK
+          - UPDATE_IPV6_RECONCILIATION_POLICY
+          - UPDATE_IPV6_TEMPLATE
+          - UPDATE_IP_ADDRESS
+          - UPDATE_IP_OVERLAP_SETTINGS
+          - UPDATE_KERBEROS_AUTHENTICATOR
+          - UPDATE_KERBEROS_DOMAIN_CONTROLLER
+          - UPDATE_KERBEROS_REALM
+          - UPDATE_KEY_SIGNING_KEY
+          - UPDATE_LDAP_AUTHENTICATOR
+          - UPDATE_LOCATION
+          - UPDATE_LOGIN_SECURITY_SETTINGS
+          - UPDATE_LTM_SERVER
+          - UPDATE_LTM_SERVER_RESOURCE_GROUP
+          - UPDATE_MAC_ADDRESS
+          - UPDATE_MAC_POOL
+          - UPDATE_MX_RECORD
+          - UPDATE_NAMING_POLICY
+          - UPDATE_NAMING_POLICY_VALUE_CONNECTOR
+          - UPDATE_NAMING_POLICY_VALUE_INCREMENTAL
+          - UPDATE_NAMING_POLICY_VALUE_INTEGER
+          - UPDATE_NAMING_POLICY_VALUE_REQUIRED
+          - UPDATE_NAMING_POLICY_VALUE_TEXT
+          - UPDATE_NAMING_RESTRICTION
+          - UPDATE_NAPTR_RECORD
+          - UPDATE_NAPTR_RECORD_GROUP
+          - UPDATE_NOTIFICATION_GROUP
+          - UPDATE_OAUTH_SERVER
+          - UPDATE_RADIUS_AUTHENTICATOR
+          - UPDATE_READONLY_IPV4_NETWORK
+          - UPDATE_REPORT
+          - UPDATE_REPORT_SCHEDULER
+          - UPDATE_REPORT_SCHEDULERS_STATUS
+          - UPDATE_RESOURCE
+          - UPDATE_RESOURCE_LOCATION
+          - UPDATE_RESPONSE_POLICY
+          - UPDATE_RESPONSE_POLICY_ZONE
+          - UPDATE_RETENTION_SETTINGS
+          - UPDATE_REVERSE_DHCP_ZONE
+          - UPDATE_SAML_IDENTITY_PROVIDER
+          - UPDATE_SAML_SERVICE_PROVIDER
+          - UPDATE_SAML_SERVICE_PROVIDER_KEY_STORE
+          - UPDATE_SAML_SERVICE_PROVIDER_METADATA
+          - UPDATE_SCHEDULED_DEPLOYMENT
+          - UPDATE_SERVER
+          - UPDATE_SERVER_GROUP
+          - UPDATE_SERVER_INTERFACE
+          - UPDATE_SERVER_MONITORING_SETTINGS
+          - UPDATE_SERVER_PASSWORD_SERVER
+          - UPDATE_SERVER_PUBLISHED_INTERFACE
+          - UPDATE_SERVICE_PRINCIPAL
+          - UPDATE_SRV_RECORD
+          - UPDATE_START_OF_AUTHORITY
+          - UPDATE_SVCB_RECORD
+          - UPDATE_TACACSPLUS_AUTHENTICATOR
+          - UPDATE_TAG
+          - UPDATE_TAG_GROUP
+          - UPDATE_TASK
+          - UPDATE_TFTP_DEPLOYMENT_ROLE
+          - UPDATE_TFTP_FILE
+          - UPDATE_TFTP_FOLDER
+          - UPDATE_TFTP_GROUP
+          - UPDATE_TSIG_KEY
+          - UPDATE_TXT_RECORD
+          - UPDATE_URI_RECORD
+          - UPDATE_USER
+          - UPDATE_USER_DEFINED_FIELD_DEFINITION
+          - UPDATE_USER_DEFINED_LINK_DEFINITION
+          - UPDATE_USER_GROUP
+          - UPDATE_USER_MAC_POOL
+          - UPDATE_USER_PASSWORD
+          - UPDATE_USER_PASSWORD_POLICY
+          - UPDATE_VENDOR_CLIENT_OPTION
+          - UPDATE_VENDOR_OPTION_DEFINITION
+          - UPDATE_VENDOR_PROFILE
+          - UPDATE_VIEW
+          - UPDATE_WINDOWS_DHCP_FAILOVER_DEPLOYMENT_ROLE
+          - UPDATE_X509_AUTHENTICATOR
+          - UPDATE_ZONE
+          - UPDATE_ZONE_SIGNING_KEY
+          - UPDATE_ZONE_TEMPLATE
+          - VERIFY_ADDRESS_MANAGER_UPDATE
+        description:
+          type: string
+          description: The description of the operation performed.
+          example: Zone was moved
+        comment:
+          type: string
+          description: The change control comment of the transaction.
+          example: Moved zone to a new view.
+        creationDateTime:
+          type: string
+          description: The date and time of the transaction.
+          example: '2022-11-15T19:48:05Z'
+        transactionId:
+          minimum: 1
+          type: integer
+          description: The unique ID of the transaction performed.
+          format: int64
+          nullable: false
+          writeOnly: true
+          example: 3149
+        user:
+          $ref: '#/components/schemas/User'
+        revertingTransaction:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/Transaction'
+      description: The transaction information of the split operation.
+    InlinedIPv4Network:
+      title: IPv4Network
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - IPv4Network
+        name:
+          type: string
+          description: The name of the resource.
+          example: name
+    InlinedIPv4Template:
+      title: IPv4Template
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - IPv4Template
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+    User:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The user or user group resource identifier.
+          format: int64
+          example: 103307
+        type:
+          type: string
+          description: The user scope resource type.
+          enum:
+          - User
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the user.
+          nullable: false
+          example: admin
+        userDefinedFields:
+          type: object
+          additionalProperties:
+            type: object
+          description: User-defined fields set for the resource.
+          example:
+            udf1: value1
+            udf2: value2
+        password:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The password of the user.
+          writeOnly: true
+          example: password
+        authenticator:
+          required:
+          - id
+          nullable: false
+          allOf:
+          - $ref: '#/components/schemas/InlinedAuthenticator'
+        email:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The email address of the user.
+          nullable: false
+          example: user@example.com
+        phoneNumber:
+          type: string
+          description: The phone number of the user.
+          example: 555-1234
+        securityPrivilege:
+          type: string
+          description: The configured security privilege of the user.
+          nullable: false
+          enum:
+          - NO_ACCESS
+          - VIEW_MY_ACCESS_RIGHTS
+          - VIEW_OTHERS_ACCESS_RIGHTS
+          - CHANGE_ACCESS_RIGHTS
+          - ADD_ACCESS_RIGHTS
+          - DELETE_ACCESS_RIGHTS
+          - ADMINISTRATOR
+        historyPrivilege:
+          type: string
+          description: The configured history privilege of the user.
+          nullable: false
+          enum:
+          - HIDE
+          - VIEW_HISTORY_LIST
+          - ADMINISTRATOR
+        accessType:
+          type: string
+          description: The access type of the user. The access type can be GUI, API,
+            or both.
+          nullable: false
+          enum:
+          - GUI
+          - API
+          - GUI_AND_API
+        passwordResetRequired:
+          type: boolean
+          description: Indicates whether the user must reset their password upon their
+            initial log in to Address Manager.
+          nullable: false
+        accountLocked:
+          type: boolean
+          description: Indicates whether the user account has been locked.
+          nullable: false
+        x509Required:
+          type: boolean
+          description: Indicates whether the user must access Address Manager using
+            X.509 authentication only.
+          nullable: false
+        administrativeAccessRights:
+          type: array
+          description: The administrative access right levels that the user has for
+            the events list, log management, and reporting.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/AdministrativeResourceAccessRightBean'
+      description: The user who modified the workflow request. For example, the authorized
+        user who approved the workflow request.
+    AdministrativeResourceAccessRightBean:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          description: The resource type the access right is applied to.
+          nullable: false
+          enum:
+          - Event
+          - Log
+          - Report
+        accessLevel:
+          type: string
+          description: The administrative action access level associated with the
+            access right.
+          nullable: false
+          enum:
+          - HIDE
+          - VIEW
+          - FULL
+      description: The administrative access right levels that the user has for the
+        events list, log management, and reporting.
+    InlinedAuthenticator:
+      title: Authenticator
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The type of authenticator.
+          enum:
+          - Authenticator
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name for the authenticator.
+          nullable: false
+          example: LDAP authenticator

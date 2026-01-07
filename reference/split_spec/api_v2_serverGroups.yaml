@@ -1,0 +1,1213 @@
+openapi: 3.0.1
+info:
+  title: BlueCat Address Manager RESTful v2 API
+  description: 'The **BlueCat Address Manager RESTful v2 API** is a new RESTful API
+    for Address Manager that presents Address Manager objects as resources. Each resource
+    has a unique endpoint, and related resources are grouped in collections. To fetch
+    an individual resource, a `GET` request is sent to the resource''s endpoint. To
+    fetch all resources in a collection, a `GET` request is sent to the collection''s
+    endpoint.
+
+
+    The RESTful v2 API is [hypermedia driven](https://en.wikipedia.org/wiki/HATEOAS)
+    and uses the [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language)
+    format for representing links. When navigating through the API, you can use those
+    links to navigate to related resources or child resources of the requested endpoint.
+    The API supports the following media types for most endpoints:  `application/hal+json`,
+    `application/json`, and `text/csv`.  For authentication, the API supports both
+    `Basic` and `Bearer` HTTP authentication schemes.
+
+
+    To get started, create a session and receive credentials for `Basic` authentication
+    by sending a `POST` request to the [/sessions](#/User%20and%20Group%20Resources/postSession)
+    endpoint, with a message body containing the user''s credentials:
+
+
+    ```{"username":"apiuser", "password":"apipass"}```
+
+
+    The response will contain an `apiToken` field that can be entered with the username
+    in the Swagger UI **Authorize** dialog. The response will also contain a `basicAuthenticationCredentials`
+    field containing a base64 encoding of the requester''s username and API token
+    delimited by a colon. This string can be injected directly into request `Authorization`
+    headers in the following format:
+
+
+    ```Authorization: Basic YXBpOlQ0OExOT3VIRGhDcnVBNEo1bGFES3JuS3hTZC9QK3pjczZXTzBJMDY=```
+
+
+    For full details on API format and authentication methods, refer to the Address
+    Manager RESTful v2 API Guide on the BlueCat Documentation Portal.'
+  termsOfService: https://docs.bluecatnetworks.com/r/Terms-and-Conditions/Terms-and-Conditions
+  contact:
+    name: BlueCat Customer Care
+    url: https://care.bluecatnetworks.com/
+  license:
+    name: BlueCat License Agreements
+    url: https://bluecatnetworks.com/license-agreements/
+  version: 9.6.0
+paths:
+  /api/v2/serverGroups:
+    get:
+      tags:
+      - Server Resources
+      summary: Retrieve a collection of server groups
+      description: Retrieve a collection of all server groups.
+      operationId: getServerGroups
+      parameters:
+      - $ref: '#/components/parameters/fields'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/filter'
+      - $ref: '#/components/parameters/orderBy'
+      - $ref: '#/components/parameters/total'
+      responses:
+        '200':
+          description: The root collection of server groups
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                properties:
+                  _links:
+                    $ref: '#/components/schemas/ServerGroupCollectionHalLinks'
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      allOf:
+                      - $ref: '#/components/schemas/ServerGroup'
+                      - type: object
+                        properties:
+                          _links:
+                            $ref: '#/components/schemas/ServerGroupResourceLinks'
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      $ref: '#/components/schemas/ServerGroup'
+            text/csv:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+security:
+- basicAuthentication: []
+- bearerToken: []
+tags:
+- name: Administrator Resources
+  description: Operations for access rights, configurations, imports, password policies,
+    server patches, services, settings,  user-defined field definitions, user-defined
+    link definitions and workflow requests.
+- name: Authenticator Resources
+  description: Operations for authenticators, Kerberos realms, service principals
+    and key distribution centers.
+- name: Database Management and Replication Resources
+  description: Operations for database replication, database backups and trust relationships.
+- name: Deployment Option Resources
+  description: Operations for deployment options, deployment option definitions, access
+    control lists and match elements.
+- name: Deployment Role Resources
+  description: Operations for deployment roles.
+- name: Device Resources
+  description: Operations for devices, device types and subtypes.
+- name: DHCP Resources
+  description: Operations for DHCP client classes and subclasses, DHCP zone groups
+    and zone declarations, DHCP deployment option definitions and  DHCP vendor profiles.
+- name: DNSSEC Resources
+  description: Operations for DNSSEC signing policies and key management, and TSIG
+    zone signing keys.
+- name: IPv4 and IPv6 Resources
+  description: Operations for addresses, blocks, IP groups, leases, networks, DHCP
+    ranges, IP reconciliation policies and discovered devices, and IP templates.
+- name: Location Resources
+  description: Operations for locations and annotated resources
+- name: MAC Address and Client Identifier Resources
+  description: Operations for DHCP client identifiers, DHCP unique identifiers, MAC
+    addresses and MAC address pools.
+- name: Monitoring Resources
+  description: Operations for events, logs, notification groups, reports and report
+    schedules, transactions, and user sessions.
+- name: Resource Record Resources
+  description: Operations for resource records.
+- name: Server Resources
+  description: Operations for deployments and deployment schedules, interfaces, servers,
+    server groups, server services.
+- name: Tag Resources
+  description: Operations for tags, tag groups, and tagged resources.
+- name: TFTP Resources
+  description: Operations for TFTP groups and files.
+- name: User and Group Resources
+  description: Operations for users and groups, favorites and tasks.
+- name: View and Zone Resources
+  description: Operations for resource record naming policies, DNS response policies,
+    zones and zone templates, and views.
+components:
+  parameters:
+    total:
+      name: total
+      in: query
+      description: Return the total number of resources matching the query.
+      required: false
+      schema:
+        type: boolean
+    offset:
+      name: offset
+      in: query
+      description: The offset of the first resource returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of resources returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    filter:
+      name: filter
+      in: query
+      description: The query filter string.
+      required: false
+      schema:
+        type: string
+    orderBy:
+      name: orderBy
+      in: query
+      description: The field path to order the response resources by.
+      required: false
+      schema:
+        type: string
+    fields:
+      name: fields
+      in: query
+      description: The subset of response resource field paths.
+      required: false
+      schema:
+        type: string
+  schemas:
+    ServerGroupResourceLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /serverGroups/12345
+          nullable: false
+          readOnly: true
+        collection:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /serverGroups
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    ServerGroup:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ServerScope'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The server scope resource type.
+            enum:
+            - ServerGroup
+          name:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The name of the resource.
+            nullable: false
+            example: name
+          multiPrimary:
+            type: boolean
+            description: Indicates whether the server group is a multi-primary server
+              group.
+          servers:
+            minItems: 1
+            type: array
+            description: A list of servers that are part of the server group.
+            writeOnly: true
+            items:
+              $ref: '#/components/schemas/AbstractServer'
+    ServerGroupCollectionHalLinks:
+      type: object
+      properties:
+        next:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/serverGroups?offset=2000&limit=1000
+          nullable: false
+          readOnly: true
+        prev:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/serverGroups?offset=0&limit=1000
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    CollectionCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 400
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Bad Request
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerConfigurationError
+          - ActiveServerMissingHaBackbone
+          - AddressHasLinkedRecords
+          - AddressIsBroadcastAddress
+          - AddressIsNetworkId
+          - AddressIsNetworkRouterAnycast
+          - AddressIsReserved
+          - AddressNotInNetwork
+          - AddressNotInRestrictedRanges
+          - AddressProtocolMatch
+          - AddressProtocolMismatch
+          - ArrayFieldSizeTooBig
+          - ArrayFieldSizeTooSmall
+          - AuthenticatorMismatch
+          - BlankFieldValue
+          - BrokenMandatoryDependency
+          - BrokenOptionalDependency
+          - CannotAssociateServerAssignedOption
+          - CannotEnableSso
+          - CannotFailoverWhileNodesDisconnected
+          - CannotFetchGroupsFromLdapAuthenticator
+          - ConflictingFieldsList
+          - ConflictingOrderBySortDirections
+          - ConflictingResourceFieldValues
+          - CreateUpdateNetworkGatewayNotSupported
+          - DatabaseNotInReplicatedState
+          - DatabaseReplicationInProgress
+          - DedicatedManagementNotEnabled
+          - DeleteAuthenticatorNotAllowed
+          - DeploymentFailedToStart
+          - DhcpDeploymentValidationNotEnabled
+          - DnsDeploymentValidationNotEnabled
+          - DuplicateFieldValue
+          - DuplicateFilterField
+          - DuplicateOrderByField
+          - DuplicateOrderByOperator
+          - DurationValueNotDivisibleBy
+          - DurationValueOutsideRange
+          - EmptyFieldValue
+          - EmptyRequestBody
+          - FailoverTargetAlreadyPrimaryServer
+          - FieldsParseError
+          - FieldsTokenError
+          - FieldHasPatchOnlyUpdate
+          - FieldNotPatchable
+          - FieldValueTooSmall
+          - FilterNeedsRefinement
+          - FilterParseError
+          - FilterTokenError
+          - ImportInProgress
+          - IncompatibleServerProfile
+          - IncompatibleServerVersion
+          - InterfaceRedundancyConfigurationError
+          - InvalidAnycastAddress
+          - InvalidAsciiString
+          - InvalidCsv
+          - InvalidDateValue
+          - InvalidDnsFeedLicense
+          - InvalidDuidValue
+          - InvalidDurationValue
+          - InvalidEmailAddress
+          - InvalidBase64Value
+          - InvalidEnumValue
+          - InvalidEnumZoneAbsoluteNameLength
+          - InvalidEnumZoneName
+          - InvalidFieldName
+          - InvalidFieldPath
+          - InvalidFileCharacterEncoding
+          - InvalidFileContentDisposition
+          - InvalidFileDataValue
+          - InvalidFilterAddress
+          - InvalidFilterAddressRange
+          - InvalidFilterAddressRangeSize
+          - InvalidFilterCountsAndPercentages
+          - InvalidFilterDate
+          - InvalidFilterEnumValue
+          - InvalidFilterField
+          - InvalidFilterMacAddress
+          - InvalidFilterPartialAddress
+          - InvalidFilterPercentage
+          - InvalidFilterValue
+          - InvalidFilterValueType
+          - InvalidFullyQualifiedDomainName
+          - InvalidFullyQualifiedDomainNameField
+          - InvalidGatewayMountPointValue
+          - InvalidHeaderValue
+          - InvalidInlinedResource
+          - InvalidIpv4AddressValue
+          - InvalidIpv4LoopbackPrefixLength
+          - InvalidIpv4RangeValue
+          - InvalidIpv6AddressValue
+          - InvalidIpv6BlockPrefixLength
+          - InvalidIpv6LoopbackPrefixLength
+          - InvalidIpv6NetworkPrefixLength
+          - InvalidIpv6RangeValue
+          - InvalidIpAddressState
+          - InvalidIpAddressValue
+          - InvalidIpAddressOrFullyQualifiedDomainNameValue
+          - InvalidIpBlockValue
+          - InvalidIpRangeValue
+          - InvalidLdapGroupName
+          - InvalidLimitParameterValue
+          - InvalidLocationCode
+          - InvalidMacAddressValue
+          - InvalidMatchCriteria
+          - InvalidMoveDestination
+          - InvalidNumberZoneAbsoluteNameLength
+          - InvalidNtpServerAddressForStratum
+          - InvalidOffsetParameterValue
+          - InvalidPaginationParameter
+          - InvalidPartialMacAddressFilter
+          - InvalidPolicyItemNameValue
+          - InvalidPrivateKeyValue
+          - InvalidQueryParameterValue
+          - InvalidRegularExpression
+          - InvalidResourceFieldValue
+          - InvalidResourceId
+          - InvalidResourceRecordData
+          - InvalidResourceType
+          - InvalidRetentionRestrictions
+          - InvalidServerPatchFile
+          - InvalidSplitPointAddress
+          - InvalidStartEndDates
+          - InvalidStringCharacters
+          - InvalidStringFieldPrefix
+          - InvalidTrustRelationshipCredentials
+          - InvalidTopLevelMerge
+          - InvalidTtlValue
+          - InvalidUdfDateValue
+          - InvalidUdfDefaultValue
+          - InvalidUdfEmailValue
+          - InvalidUdfNumberValue
+          - InvalidUdfPredefinedValue
+          - InvalidUdfPredefinedValues
+          - InvalidUdfUrlValue
+          - InvalidUdfValidationProperties
+          - InvalidUdfValue
+          - InvalidUidValue
+          - InvalidUndoTransactionId
+          - InvalidUrlScheme
+          - InvalidUrlValue
+          - InvalidX509CertificateValue
+          - InvalidZoneName
+          - IpRangeBroadcastOrNetworkIdAssigned
+          - IpRangeDoesNotOverlap
+          - IpRangeExcludesAssignedAddresses
+          - IpRangeExcludesChildRanges
+          - IpRangeExcludesDhcpRanges
+          - IpRangeExcludesGateway
+          - IpRangeIncludesGateway
+          - IpRangeNotAlignedOnRangeBoundary
+          - IpRangeOutsideNetworkBlockBoundary
+          - IpRangeOutsideParent
+          - IpRangeOverlapsSiblings
+          - IpRangeOverlapsRangeInOtherConfiguration
+          - IpRangePartiallyIncludesChildRanges
+          - IpRangeTooBig
+          - IpRangeTooSmall
+          - JsonDeserializationError
+          - JsonParseError
+          - JsonFieldParseError
+          - MacAddressInUse
+          - MismatchedLocationCodeParent
+          - MismatchedManagementAndServicesInterfaces
+          - MismatchedMergeTypes
+          - MissingMandatoryChangeControlComment
+          - MissingMergeDestinationInSiblings
+          - MissingPatchableField
+          - MissingQueryParameter
+          - MissingRequiredDeploymentRoleInterface
+          - MissingRequiredField
+          - MissingRequiredFilterField
+          - MissingRequiredFilterPredicate
+          - MoveAddressUnsupportedState
+          - MoveRolesWithOptionsOnServer
+          - MultipleBgpNeighborsNotSupported
+          - MultipleQueryParameterValues
+          - MultipleValuesNotAllowed
+          - NamingPolicyViolation
+          - NamingPolicyRestrictionViolation
+          - NetworkInterfaceNotConfigured
+          - NothingToDeployForUser
+          - NoAssignedDeploymentRoles
+          - NoHsmConfiguration
+          - NoKeyDistributionCentersInRealm
+          - NoPreviousFullDeploymentForDifferential
+          - NoSpaceForAddress
+          - NoSpaceForBlock
+          - NoSpaceForNetwork
+          - NoSpaceForRange
+          - OrderByParseError
+          - OrderByTokenError
+          - PaginationNotSupported
+          - PassiveServerConfigurationError
+          - PassiveServerMissingHaBackbone
+          - PasswordFailedRequirements
+          - RedirectPolicyTypeDisabled
+          - ReplicatedServerLimitReached
+          - ReplicationOperationNotAllowed
+          - ResetServerServicesRequired
+          - ResourceFieldNotInConfiguration
+          - ResourceFieldNotInRestrictedZones
+          - ResourceHasCircularReference
+          - ResourceHasRecordsNotInZone
+          - ResourceNotInConfiguration
+          - ResourceNotInRestrictedZones
+          - ResourceNotInTemplate
+          - ResourceNotInView
+          - ServerCommandError
+          - ServerControlResetRequired
+          - ServerGroupNotMultiPrimary
+          - ServerGroupSizeLimitReached
+          - ServerHasAssignedDeploymentOptions
+          - ServerHasAssignedDeploymentRoles
+          - ServerIsDeploying
+          - ServerIsMultiPrimaryServerGroupMember
+          - ServerIsPassive
+          - ServerManagementAddressProtocolMismatch
+          - ServerNotActive
+          - ServerNotDisabled
+          - ServerNotManaged
+          - ServerNotStandaloneServer
+          - ServerNotTrusted
+          - ServerServiceInterfaceNameMismatch
+          - ServerSslHandshakeError
+          - SigningPolicyInUse
+          - SsoEnforcementRequirementsUnmet
+          - StringFieldTooBig
+          - StringFieldTooSmall
+          - TemplateApplicationFailedToStart
+          - TemplateNotAssigned
+          - TotalCountNotSupported
+          - TrustRelationshipLimitReached
+          - UdfPredefinedValueInUse
+          - UdfValidationPropertiesInUse
+          - UdfValueExceedsMaximumLength
+          - UdfValueLessThanMinimum
+          - UdfValueLessThanMinimumLength
+          - UdfValueOutsideRange
+          - UnsupportedAggregateOperator
+          - UnsupportedAggregateFilterOperator
+          - UnsupportedDeploymentOptionScope
+          - UnsupportedDeploymentRoleInterfaceType
+          - UnsupportedEmbeddableCollection
+          - UnsupportedEmbeddableResource
+          - UnsupportedFieldsOperatorForMediaType
+          - UnsupportedFilterOperator
+          - UnsupportedFilterOperatorForNullValue
+          - UnsupportedHeaderEncoding
+          - UnsupportedHeaderValue
+          - UnsupportedImportFileType
+          - UnsupportedMultiPrimaryDeploymentOption
+          - UnsupportedOrderByField
+          - UnsupportedOrderByOperator
+          - UnsupportedResourceFieldValue
+          - UnsupportedResourceType
+          - UnsupportedServerCommand
+          - ValueLessThanMinimum
+          - ValueOutsideRange
+          - WorkflowRequestNotPending
+          - WrongCsvRowFieldCount
+          - WrongResourceType
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 403
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Forbidden
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - AccessDenied
+          - CreateNotAllowed
+          - DeleteLastLinkNotAllowed
+          - DeleteLastStandbyServerNotAllowed
+          - DeleteNotAllowed
+          - DisableHaServerServiceNotSupported
+          - EnableHaServerServiceNotSupported
+          - FieldUpdateNotAllowed
+          - FileSizeTooBig
+          - InvalidAuthorizationScheme
+          - OperationNotPermitted
+          - ReadOnlySession
+          - ReadOnlySessionOnPrimary
+          - ResourceInUse
+          - ServerIsF5PoolMember
+          - ServerInReplication
+          - UpdateNotAllowed
+          - WorkflowRequestApproveDenyNotAllowed
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    CollectionTotalCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 401
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Unauthorized
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - InvalidAuthorizationCredentials
+          - InvalidServerPassword
+          - InvalidUsernameOrApiKey
+          - InvalidUsernameOrPassword
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 404
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Not Found
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerNotConnected
+          - CannotConnectToServer
+          - InlinedResourceNotFound
+          - NetworkNotFoundForAddress
+          - PassiveServerNotConnected
+          - ResourceNotFound
+          - ResourceFieldNotFound
+          - ServerGroupHasNoMembers
+          - ServerNotConnected
+          - ServerServiceInterfaceNotConnected
+          - WrongResourceCollection
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    ServerScope:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The server scope resource type.
+        name:
+          type: string
+          description: The name of the resource.
+          example: name
+        userDefinedFields:
+          type: object
+          additionalProperties:
+            type: object
+          description: User-defined fields set for the resource.
+          example:
+            udf1: value1
+            udf2: value2
+        configuration:
+          required:
+          - id
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/InlinedConfiguration'
+      description: The list of servers or server groups for the deployment.
+      discriminator:
+        propertyName: type
+    AbstractServer:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The server scope resource type.
+          enum:
+          - AbstractServer
+        name:
+          type: string
+          description: The name of the resource.
+          example: name
+        userDefinedFields:
+          type: object
+          additionalProperties:
+            type: object
+          description: User-defined fields set for the resource.
+          example:
+            udf1: value1
+            udf2: value2
+        configuration:
+          required:
+          - id
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/InlinedConfiguration'
+        profile:
+          type: string
+          description: The profile of the server.
+          enum:
+          - ADONIS_XMB4
+          - ADONIS_XMB3
+          - OTHER_DNS_SERVER
+          - DNS_DHCP_SERVER_20
+          - DNS_DHCP_SERVER_45
+          - DNS_DHCP_SERVER_60
+          - DNS_DHCP_SERVER_100
+          - DNS_DHCP_SERVER_100_D
+          - LTM
+          - GTM
+          - DNS_DHCP_GEN4_7000
+          - DNS_DHCP_GEN4_5000
+          - DNS_DHCP_GEN4_4000
+          - DNS_DHCP_GEN4_2000
+          - CLOUD_DNS_SERVER
+          - BLUECAT_8500
+          - BLUECAT_6500
+          - BLUECAT_4500
+          - BLUECAT_2500
+          - LEGACY
+        state:
+          type: string
+          description: The current state of the server, indicating whether the server
+            is enabled or disabled.
+          enum:
+          - ENABLED
+          - DISABLED
+          - FAILOVER
+          - RESET_CONTROL
+          - REPAIR
+        username:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The username used to authenticate with the server.
+          example: admin
+        password:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The password used to authenticate with the server.
+          example: Passw0rd!
+        serverGroup:
+          required:
+          - id
+          allOf:
+          - $ref: '#/components/schemas/ServerGroup'
+        connected:
+          type: boolean
+          description: Indicates whether the server is connected to Address Manager.
+        monitoringEnabled:
+          type: boolean
+          description: Indicates whether monitoring service is enabled on the server.
+        snmp:
+          $ref: '#/components/schemas/SNMP'
+        interfaces:
+          minItems: 1
+          type: array
+          description: The list of network interfaces of the server.
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/NetworkInterface'
+        location:
+          required:
+          - id
+          allOf:
+          - $ref: '#/components/schemas/InlinedLocation'
+        statistics:
+          type: object
+          additionalProperties:
+            type: object
+          description: Displays statistics information collected from the monitoring
+            service.
+          readOnly: true
+        overrideConfigurationLevelDhcpValidation:
+          type: boolean
+          description: Indicates whether DHCP deployment validation settings configured
+            at the configuration level are overridden at the server level.
+          nullable: false
+        overrideConfigurationLevelDnsValidation:
+          type: boolean
+          description: Indicates whether DNS deployment validation settings configured
+            at the configuration level are overridden at the server level.
+          nullable: false
+        dhcpConfigurationValidationEnabled:
+          type: boolean
+          description: Indicates whether the syntax of the dhcpd.conf file is validated
+            prior to deployment from Address Manager.
+          nullable: false
+        dnsConfigurationValidationEnabled:
+          type: boolean
+          description: Indicates whether the syntax of the named.conf file is validated
+            prior to deployment from Address Manager.
+          nullable: false
+        dnsZoneValidationEnabled:
+          type: boolean
+          description: Indicates whether the syntax of each DNS zone file is validated
+            prior to deployment from Address Manager.
+          nullable: false
+        checkIntegrityValidation:
+          type: string
+          description: The method for which the syntax checks of the DNS zone file
+            is checked.
+          nullable: false
+          enum:
+          - NONE
+          - LOCAL
+          - LOCAL_SIBLING
+          - FULL
+          - FULL_SIBLING
+        checkMxCnameValidation:
+          type: string
+          description: Checks if MX records point to a CNAME record rather than an
+            A or AAAA, and determines how Address Manager handles conditions found
+            by the check.
+          nullable: false
+          enum:
+          - IGNORE
+          - WARN
+          - FAIL
+        checkMxValidation:
+          type: string
+          description: Checks if MX records point to an IP address rather than an
+            A or AAAA, and determines how Address Manager handles conditions found
+            by the check.
+          nullable: false
+          enum:
+          - IGNORE
+          - WARN
+          - FAIL
+        checkNamesValidation:
+          type: string
+          description: Checks the names within the DNS zone files and determines how
+            Address Manager handles conditions found by the check.
+          nullable: false
+          enum:
+          - IGNORE
+          - WARN
+          - FAIL
+        checkNsValidation:
+          type: string
+          description: Checks if NS records point to an IP address rather than an
+            A or AAAA, and determines how Address Manager handles conditions found
+            by the check.
+          nullable: false
+          enum:
+          - IGNORE
+          - WARN
+          - FAIL
+        checkSrvCnameValidation:
+          type: string
+          description: Checks if SRV records point to a CNAME record rather than an
+            A or AAAA, and determines how Address Manager handles conditions found
+            by the check.
+          nullable: false
+          enum:
+          - IGNORE
+          - WARN
+          - FAIL
+        checkWildcardValidation:
+          type: string
+          description: Checks for wildcards in zone names that don't appear as the
+            last segment of a zone name, and determines how Address Manager handles
+            conditions found by the check.
+          nullable: false
+          enum:
+          - IGNORE
+          - WARN
+        privateAddress:
+          type: string
+          description: The private IP address of the server.
+          example: 10.10.10.10
+        encryptedNotificationsEnabled:
+          type: boolean
+          description: Indicates whether notifications are encrypted between Address
+            Manager and the DNS/DHCP Server
+          writeOnly: true
+        managementUrl:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: Specifies the management URL for an F5 LTM or GTM server.
+          example: 10.10.10.10
+        selfIpAddress:
+          type: string
+          description: Specifies the self URL for an F5 GTM server.
+          example: 10.10.10.10
+        haBackboneEnabled:
+          type: boolean
+          description: Indicates whether a backbone is enabled between nodes of a
+            high-availability pair.
+          nullable: false
+        haPingAddress:
+          type: string
+          description: Sets the ping address of the high-availability pair.
+          example: 10.10.10.10
+        dhcpServicePrincipal:
+          required:
+          - id
+          allOf:
+          - $ref: '#/components/schemas/InlinedKerberosServicePrincipal'
+        dnsServicePrincipal:
+          required:
+          - id
+          allOf:
+          - $ref: '#/components/schemas/InlinedKerberosServicePrincipal'
+        serviceProviderAccount:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The hosting service account name or number associated with
+            the BlueCat Cloud DNS subscription.
+        serviceProviderApiKey:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The hosting service API key associated with the BlueCat Cloud
+            DNS subscription.
+        _inheritedFields:
+          type: array
+          description: The fields inherited from the parent resource.
+          readOnly: true
+          items:
+            type: string
+            description: The fields inherited from the parent resource.
+      description: A list of servers that are part of the server group.
+      discriminator:
+        propertyName: type
+    InlinedConfiguration:
+      title: Configuration
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - Configuration
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+    NetworkInterface:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - NetworkInterface
+        name:
+          type: string
+          description: The fully qualified name assigned to the interface.
+          nullable: false
+          example: bdds1.acme.com
+        userDefinedFields:
+          type: object
+          additionalProperties:
+            type: object
+          description: User-defined fields set for the resource.
+          example:
+            udf1: value1
+            udf2: value2
+        configuration:
+          required:
+          - id
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/InlinedConfiguration'
+        server:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/AbstractServer'
+        secondaryAddress:
+          type: string
+          description: The secondary IP address of the interface.
+          example: 10.10.10.5
+        managementAddress:
+          type: string
+          description: The IP address configured on the eth0 interface in the DNS/DHCP
+            Administration Console. If dedicated management is enabled, The IP address
+            for the dedicated management interface (eth2). On a multi-interface DNS/DHCP
+            Server, the interface is used for all management traffic such as CS, PSM,
+            SNMP, and SSH.
+          example: 10.10.0.1
+        managementAddressPrefixLength:
+          maximum: 128
+          minimum: 1
+          type: integer
+          description: The prefix length for the management address interface.
+          format: int32
+          readOnly: true
+          example: 24
+        servicesIpv4Address:
+          type: string
+          description: The IPv4 address for the services interface. On a multi-interface
+            DNS/DHCP Server, the interface is used for all service traffic such as
+            DNS, DHCP, and TFTP services.
+          readOnly: true
+          example: 10.10.10.1
+        servicesIpv4PrefixLength:
+          maximum: 32
+          minimum: 1
+          type: integer
+          description: The IPv4 prefix length for the services interface.
+          format: int32
+          readOnly: true
+          example: 24
+        servicesIpv6Address:
+          type: string
+          description: The IPv6 address for the services interface.
+          readOnly: true
+          example: 2001:db8::1:1
+        servicesIpv6PrefixLength:
+          maximum: 128
+          minimum: 1
+          type: integer
+          description: The IPv6 prefix length for the services interface.
+          format: int32
+          readOnly: true
+          example: 64
+        haBackboneAddress:
+          type: string
+          description: The IP address of the backbone connection if configured as
+            a member of a high availability pair.
+          readOnly: true
+          example: 10.10.10.5
+        haBackbonePrefixLength:
+          maximum: 128
+          minimum: 1
+          type: integer
+          description: The subnet prefix length of the high availability backbone.
+          format: int32
+          readOnly: true
+          example: 24
+        redundancyEnabled:
+          type: boolean
+          description: Indicates whether redundancy is enabled through port bonding.
+          readOnly: true
+        redundancyScenario:
+          type: string
+          description: The type of redundancy scenario configured.
+          enum:
+          - ACTIVE_BACKUP
+          - ACTIVE_ACTIVE
+      description: The network interfaces of the xHA pair.
+    InlinedKerberosServicePrincipal:
+      title: KerberosServicePrincipal
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - KerberosServicePrincipal
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name for the Kerberos service principal defined in the
+            User Logon name field in Windows configuration section.
+          nullable: false
+          example: DHCP/dhcp1.bcn.com
+    InlinedLocation:
+      title: Location
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - Location
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+    SNMP:
+      type: object
+      properties:
+        version:
+          type: string
+          description: The SNMP version for the router or switch.
+          nullable: false
+          enum:
+          - v1
+          - v2c
+          - v3
+        enabled:
+          type: boolean
+          description: Indicates whether SNMP service is enabled.
+        port:
+          maximum: 65535
+          minimum: 1
+          type: integer
+          description: The SNMP port that is used to communicate with the router or
+            switch.
+          format: int32
+          example: 161
+      description: Defines the SNMP settings of the configuration.
+      discriminator:
+        propertyName: version

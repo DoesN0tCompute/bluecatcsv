@@ -1,0 +1,22 @@
+bam:
+  base_url: "https://192.168.40.23"
+  username: "admin"
+  password: "admin"
+  api_version: "v2"
+  timeout: 30
+  verify_ssl: false
+
+policy:
+  safe_mode: true
+  update_mode: "upsert"
+  max_concurrent_operations: 5
+  initial_concurrency: 2
+  max_concurrency: 10
+  auto_create_network: true
+  auto_create_zone: true
+  allow_overwrite: false
+
+logging:
+  level: INFO
+  format: json
+  file: "test-deployment-roles.log"

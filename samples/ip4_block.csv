@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,name,*cidr,description
+1,ip4_block,create,Default,Corporate-Network,10.0.0.0/8,Corporate network address space
+2,ip4_block,create,Default,Datacenter-Primary,172.16.0.0/12,Primary datacenter infrastructure
+3,ip4_block,create,Default,Branch-Offices,192.168.0.0/16,Branch office networks

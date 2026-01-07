@@ -1,0 +1,5 @@
+*row_id,*object_type,*action,*udl_name,*source_type,*source_path,*destination_type,*destination_path,description
+1,user_defined_link,create,AssociatedDevice,ip4_address,10.0.1.10,device,firewall-01,Primary firewall management address
+2,user_defined_link,create,AssociatedDevice,ip4_address,10.0.1.11,device,switch-core-01,Core switch management address
+3,user_defined_link,create,BackupServer,ip4_network,10.1.0.0/24,device,backup-server-01,Network backup server association
+4,user_defined_link,create,RelatedHost,host_record,www.example.com,host_record,www2.example.com,Primary/Secondary web server relationship

@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,*view_path,*zone_name,name,text,ttl,description
+1,txt_record,create,Default,Internal,example.local,_dmarc.example.local,"v=DMARC1; p=quarantine; rua=mailto:dmarc@example.local",3600,DMARC policy record
+2,txt_record,create,Default,Internal,example.local,example.local,"v=spf1 mx ip4:10.1.1.0/24 -all",3600,SPF policy record
+3,txt_record,create,Default,Internal,example.local,_verify.example.local,"domain-verification=abc123xyz",3600,Domain verification record

@@ -1,0 +1,3 @@
+*row_id,*object_type,*action,*config,*view_path,*zone_name,name,ttl,description
+1,external_host_record,create,Default,Internal,external.example.local,cloud-service.external.example.local,3600,External cloud service endpoint
+2,external_host_record,create,Default,Internal,external.example.local,cdn.external.example.local,3600,External CDN endpoint

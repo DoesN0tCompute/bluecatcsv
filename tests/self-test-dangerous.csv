@@ -1,0 +1,6 @@
+row_id,object_type,action,config,bam_id,name,verify_name
+config_delete,configuration,delete,Default,1,Test-Config-Delete,Test-Config-Delete
+view_delete,dns_view,delete,Default,2,Test-View-Delete,Test-View-Delete
+block_delete,ip4_block,delete,Default,3,Test-Block-Delete,Test-Block-Delete
+network_delete,ip4_network,delete,Default,4,Test-Network-Delete,Test-Network-Delete
+zone_delete,dns_zone,delete,Default,5,Test-Zone-Delete,Test-Zone-Delete

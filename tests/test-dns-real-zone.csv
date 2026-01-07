@@ -1,0 +1,2 @@
+row_id,object_type,action,config,zone_path,name,role_type,interfaces,ns_record_ttl
+1,dns_deployment_role,create,Default,Internal/test.local,Zone-DNS-Primary-Real,PRIMARY,"4402278|4402274",3600

@@ -1,0 +1,9 @@
+row_id,object_type,action,config,parent,view_path,zone_name,cidr,name,address,mac,description,addresses,cname,exchange,preference,text,target,port,priority,weight,ttl
+block_comp,ip4_block,create,Default,,,,172.16.201.0/24,Comprehensive-Test-Block,,,Comprehensive test block,,,,,,,,,
+network_comp,ip4_network,create,Default,/IPv4/172.16.201.0/24,,,172.16.201.0/28,Comprehensive-Test-Network,,,Comprehensive test network,,,,,,,,,
+address_comp,ip4_address,create,Default,/IPv4/172.16.201.0/28,,,,,comprehensive-host,172.16.201.5,00:11:22:33:44:77,Comprehensive test host,,,,,,,,,
+zone_comp,dns_zone,create,Default,,Internal,comprehensive-test.example.com,,,,,,Zone for comprehensive testing,,,,,,,,,
+host_comp,host_record,create,Default,,Internal,comprehensive-test.example.com,,www.comprehensive-test.example.com,,,,Host record test,10.1.0.5,,,,,,,,3600
+alias_comp,alias_record,create,Default,,Internal,comprehensive-test.example.com,,cdn.comprehensive-test.example.com,,,,,www.comprehensive-test.example.com,,,,,,,3600
+mx_comp,mx_record,create,Default,,Internal,comprehensive-test.example.com,,comprehensive-test.example.com,,,,,,,mail.comprehensive-test.example.com,10,,,,,3600
+txt_comp,txt_record,create,Default,,Internal,comprehensive-test.example.com,,_dmarc.comprehensive-test.example.com,,,,,,,,v=DMARC1; p=none,,,,3600

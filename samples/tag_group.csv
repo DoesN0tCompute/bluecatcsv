@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,name
+1,tag_group,create,Environment
+2,tag_group,create,Owner
+3,tag_group,create,Compliance

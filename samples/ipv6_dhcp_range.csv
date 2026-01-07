@@ -1,0 +1,7 @@
+*row_id,*object_type,*action,*config,network_path,*range,name,splitAroundStaticAddresses,lowWaterMark,highWaterMark
+1,ipv6_dhcp_range,create,Default,Default/2001:db8::/32/2001:db8:1::/64,2001:db8:1::1000-2001:db8:1::2000,IPv6-Production-DHCP-Pool,false,,
+2,ipv6_dhcp_range,create,Default,Default/2001:db8::/32/2001:db8:2::/64,2001:db8:2::1000-2001:db8:2::2000,IPv6-Development-DHCP-Pool,false,20,80
+
+
+
+

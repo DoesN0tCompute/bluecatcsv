@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,config,name,match_elements
+1,acl,create,Default,internal-networks,10.0.0.0/8|172.16.0.0/12|192.168.0.0/16
+2,acl,create,Default,trusted-hosts,10.1.1.0/24|10.1.2.0/24
+3,acl,create,Default,dns-servers,10.0.0.53|10.0.1.53

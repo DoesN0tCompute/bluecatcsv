@@ -1,0 +1,10 @@
+*row_id,*object_type,*action,*config,*address,name,mac,description,state
+1,ip4_address,create,Default,10.1.1.10,app-server-01,00:50:56:01:01:01,Primary application server,STATIC
+2,ip4_address,create,Default,10.1.1.11,app-server-02,00:50:56:01:01:02,Secondary application server,STATIC
+3,ip4_address,create,Default,10.1.1.20,web-server-01,00:50:56:01:01:10,Primary web server,STATIC
+4,ip4_address,create,Default,10.1.10.10,db-server-01,00:50:56:01:10:01,Primary database server,STATIC
+5,ip4_address,create,Default,10.1.10.11,db-server-02,00:50:56:01:10:02,Secondary database server,STATIC
+6,ip4_address,create,Default,10.2.1.10,mail-server-01,00:50:56:02:01:10,Primary mail server,STATIC
+7,ip4_address,create,Default,10.2.1.11,mail-server-02,00:50:56:02:01:11,Backup mail server,STATIC
+8,ip4_address,create,Default,10.1.1.30,dc01,00:50:56:01:01:30,Domain controller,STATIC
+9,ip4_address,create,Default,10.1.1.40,pbx-server,00:50:56:01:01:40,PBX server,STATIC

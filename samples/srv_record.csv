@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,*view_path,*zone_name,name,target,port,priority,weight,ttl,description
+1,srv_record,create,Default,Internal,example.local,_ldap._tcp.example.local,dc01.example.local,389,10,50,3600,LDAP service record
+2,srv_record,create,Default,Internal,example.local,_kerberos._tcp.example.local,dc01.example.local,88,10,50,3600,Kerberos KDC service
+3,srv_record,create,Default,Internal,example.local,_sip._tcp.example.local,pbx.example.local,5060,10,50,3600,SIP service record

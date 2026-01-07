@@ -1,0 +1,6 @@
+*row_id,*object_type,*action,*config,network_path,name,*code,value,server_scope
+1,dhcpv4_service_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,default-lease-time,51,3600,DHCP_SERVER
+2,dhcpv4_service_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,max-lease-time,51,86400,DHCP_SERVER
+3,dhcpv4_service_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,ddns-updates,51,true,DHCP_SERVER
+4,dhcpv4_service_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,ddns-ttl,51,3600,DHCP_SERVER
+5,dhcpv4_service_deployment_option,create,Default,Default/10.0.0.0/8/10.1.1.0/24,ping-check,51,true,DHCP_SERVER

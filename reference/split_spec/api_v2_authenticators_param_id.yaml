@@ -1,0 +1,1469 @@
+openapi: 3.0.1
+info:
+  title: BlueCat Address Manager RESTful v2 API
+  description: 'The **BlueCat Address Manager RESTful v2 API** is a new RESTful API
+    for Address Manager that presents Address Manager objects as resources. Each resource
+    has a unique endpoint, and related resources are grouped in collections. To fetch
+    an individual resource, a `GET` request is sent to the resource''s endpoint. To
+    fetch all resources in a collection, a `GET` request is sent to the collection''s
+    endpoint.
+
+
+    The RESTful v2 API is [hypermedia driven](https://en.wikipedia.org/wiki/HATEOAS)
+    and uses the [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language)
+    format for representing links. When navigating through the API, you can use those
+    links to navigate to related resources or child resources of the requested endpoint.
+    The API supports the following media types for most endpoints:  `application/hal+json`,
+    `application/json`, and `text/csv`.  For authentication, the API supports both
+    `Basic` and `Bearer` HTTP authentication schemes.
+
+
+    To get started, create a session and receive credentials for `Basic` authentication
+    by sending a `POST` request to the [/sessions](#/User%20and%20Group%20Resources/postSession)
+    endpoint, with a message body containing the user''s credentials:
+
+
+    ```{"username":"apiuser", "password":"apipass"}```
+
+
+    The response will contain an `apiToken` field that can be entered with the username
+    in the Swagger UI **Authorize** dialog. The response will also contain a `basicAuthenticationCredentials`
+    field containing a base64 encoding of the requester''s username and API token
+    delimited by a colon. This string can be injected directly into request `Authorization`
+    headers in the following format:
+
+
+    ```Authorization: Basic YXBpOlQ0OExOT3VIRGhDcnVBNEo1bGFES3JuS3hTZC9QK3pjczZXTzBJMDY=```
+
+
+    For full details on API format and authentication methods, refer to the Address
+    Manager RESTful v2 API Guide on the BlueCat Documentation Portal.'
+  termsOfService: https://docs.bluecatnetworks.com/r/Terms-and-Conditions/Terms-and-Conditions
+  contact:
+    name: BlueCat Customer Care
+    url: https://care.bluecatnetworks.com/
+  license:
+    name: BlueCat License Agreements
+    url: https://bluecatnetworks.com/license-agreements/
+  version: 9.6.0
+paths:
+  /api/v2/authenticators/{id}:
+    get:
+      tags:
+      - Authenticator Resources
+      summary: Retrieve a single authenticator
+      description: Retrieve information about a single authenticator configured with
+        Address Manager.
+      operationId: getAuthenticator
+      parameters:
+      - $ref: '#/components/parameters/fields'
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: An authenticator
+          content:
+            application/hal+json:
+              schema:
+                allOf:
+                - oneOf:
+                  - $ref: '#/components/schemas/AddressManagerAuthenticator'
+                  - $ref: '#/components/schemas/KerberosAuthenticator'
+                  - $ref: '#/components/schemas/LDAPAuthenticator'
+                  - $ref: '#/components/schemas/OAuthAuthorizationServer'
+                  - $ref: '#/components/schemas/RADIUSAuthenticator'
+                  - $ref: '#/components/schemas/SAMLIdentityProvider'
+                  - $ref: '#/components/schemas/TACACSPlusAuthenticator'
+                  - $ref: '#/components/schemas/X509Authenticator'
+                - type: object
+                  properties:
+                    _links:
+                      $ref: '#/components/schemas/AddressManagerAuthenticatorResourceLinks'
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/AddressManagerAuthenticator'
+                - $ref: '#/components/schemas/KerberosAuthenticator'
+                - $ref: '#/components/schemas/LDAPAuthenticator'
+                - $ref: '#/components/schemas/OAuthAuthorizationServer'
+                - $ref: '#/components/schemas/RADIUSAuthenticator'
+                - $ref: '#/components/schemas/SAMLIdentityProvider'
+                - $ref: '#/components/schemas/TACACSPlusAuthenticator'
+                - $ref: '#/components/schemas/X509Authenticator'
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    put:
+      tags:
+      - Authenticator Resources
+      summary: Update an authenticator
+      description: Update an authenticator configured with Address Manager.
+      operationId: putAuthenticator
+      parameters:
+      - $ref: '#/components/parameters/x-bcn-change-control-comment'
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          application/hal+json:
+            schema:
+              discriminator:
+                propertyName: type
+                mapping:
+                  KerberosAuthenticator: '#/components/schemas/KerberosAuthenticatorPutRequestBody'
+                  LDAPAuthenticator: '#/components/schemas/LDAPAuthenticatorPutRequestBody'
+                  OAuthAuthorizationServer: '#/components/schemas/OAuthAuthorizationServerPutRequestBody'
+                  RADIUSAuthenticator: '#/components/schemas/RADIUSAuthenticatorPutRequestBody'
+                  SAMLIdentityProvider: '#/components/schemas/SAMLIdentityProviderPutRequestBody'
+                  TACACSPlusAuthenticator: '#/components/schemas/TACACSPlusAuthenticatorPutRequestBody'
+                  X509Authenticator: '#/components/schemas/X509AuthenticatorPutRequestBody'
+              oneOf:
+              - $ref: '#/components/schemas/KerberosAuthenticatorPutRequestBody'
+              - $ref: '#/components/schemas/LDAPAuthenticatorPutRequestBody'
+              - $ref: '#/components/schemas/OAuthAuthorizationServerPutRequestBody'
+              - $ref: '#/components/schemas/RADIUSAuthenticatorPutRequestBody'
+              - $ref: '#/components/schemas/SAMLIdentityProviderPutRequestBody'
+              - $ref: '#/components/schemas/TACACSPlusAuthenticatorPutRequestBody'
+              - $ref: '#/components/schemas/X509AuthenticatorPutRequestBody'
+            encoding: {}
+          application/json:
+            schema:
+              discriminator:
+                propertyName: type
+                mapping:
+                  KerberosAuthenticator: '#/components/schemas/KerberosAuthenticatorPutRequestBody'
+                  LDAPAuthenticator: '#/components/schemas/LDAPAuthenticatorPutRequestBody'
+                  OAuthAuthorizationServer: '#/components/schemas/OAuthAuthorizationServerPutRequestBody'
+                  RADIUSAuthenticator: '#/components/schemas/RADIUSAuthenticatorPutRequestBody'
+                  SAMLIdentityProvider: '#/components/schemas/SAMLIdentityProviderPutRequestBody'
+                  TACACSPlusAuthenticator: '#/components/schemas/TACACSPlusAuthenticatorPutRequestBody'
+                  X509Authenticator: '#/components/schemas/X509AuthenticatorPutRequestBody'
+              oneOf:
+              - $ref: '#/components/schemas/KerberosAuthenticatorPutRequestBody'
+              - $ref: '#/components/schemas/LDAPAuthenticatorPutRequestBody'
+              - $ref: '#/components/schemas/OAuthAuthorizationServerPutRequestBody'
+              - $ref: '#/components/schemas/RADIUSAuthenticatorPutRequestBody'
+              - $ref: '#/components/schemas/SAMLIdentityProviderPutRequestBody'
+              - $ref: '#/components/schemas/TACACSPlusAuthenticatorPutRequestBody'
+              - $ref: '#/components/schemas/X509AuthenticatorPutRequestBody'
+            encoding: {}
+      responses:
+        '200':
+          description: The updated authenticator
+          content:
+            application/hal+json:
+              schema:
+                allOf:
+                - oneOf:
+                  - $ref: '#/components/schemas/KerberosAuthenticator'
+                  - $ref: '#/components/schemas/LDAPAuthenticator'
+                  - $ref: '#/components/schemas/OAuthAuthorizationServer'
+                  - $ref: '#/components/schemas/RADIUSAuthenticator'
+                  - $ref: '#/components/schemas/SAMLIdentityProvider'
+                  - $ref: '#/components/schemas/TACACSPlusAuthenticator'
+                  - $ref: '#/components/schemas/X509Authenticator'
+                - type: object
+                  properties:
+                    _links:
+                      $ref: '#/components/schemas/KerberosAuthenticatorResourceLinks'
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/KerberosAuthenticator'
+                - $ref: '#/components/schemas/LDAPAuthenticator'
+                - $ref: '#/components/schemas/OAuthAuthorizationServer'
+                - $ref: '#/components/schemas/RADIUSAuthenticator'
+                - $ref: '#/components/schemas/SAMLIdentityProvider'
+                - $ref: '#/components/schemas/TACACSPlusAuthenticator'
+                - $ref: '#/components/schemas/X509Authenticator'
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+    delete:
+      tags:
+      - Authenticator Resources
+      summary: Delete an authenticator
+      description: Delete an authenticator configured with Address Manager.
+      operationId: deleteAuthenticator
+      parameters:
+      - $ref: '#/components/parameters/x-bcn-change-control-comment'
+      - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: None
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+security:
+- basicAuthentication: []
+- bearerToken: []
+tags:
+- name: Administrator Resources
+  description: Operations for access rights, configurations, imports, password policies,
+    server patches, services, settings,  user-defined field definitions, user-defined
+    link definitions and workflow requests.
+- name: Authenticator Resources
+  description: Operations for authenticators, Kerberos realms, service principals
+    and key distribution centers.
+- name: Database Management and Replication Resources
+  description: Operations for database replication, database backups and trust relationships.
+- name: Deployment Option Resources
+  description: Operations for deployment options, deployment option definitions, access
+    control lists and match elements.
+- name: Deployment Role Resources
+  description: Operations for deployment roles.
+- name: Device Resources
+  description: Operations for devices, device types and subtypes.
+- name: DHCP Resources
+  description: Operations for DHCP client classes and subclasses, DHCP zone groups
+    and zone declarations, DHCP deployment option definitions and  DHCP vendor profiles.
+- name: DNSSEC Resources
+  description: Operations for DNSSEC signing policies and key management, and TSIG
+    zone signing keys.
+- name: IPv4 and IPv6 Resources
+  description: Operations for addresses, blocks, IP groups, leases, networks, DHCP
+    ranges, IP reconciliation policies and discovered devices, and IP templates.
+- name: Location Resources
+  description: Operations for locations and annotated resources
+- name: MAC Address and Client Identifier Resources
+  description: Operations for DHCP client identifiers, DHCP unique identifiers, MAC
+    addresses and MAC address pools.
+- name: Monitoring Resources
+  description: Operations for events, logs, notification groups, reports and report
+    schedules, transactions, and user sessions.
+- name: Resource Record Resources
+  description: Operations for resource records.
+- name: Server Resources
+  description: Operations for deployments and deployment schedules, interfaces, servers,
+    server groups, server services.
+- name: Tag Resources
+  description: Operations for tags, tag groups, and tagged resources.
+- name: TFTP Resources
+  description: Operations for TFTP groups and files.
+- name: User and Group Resources
+  description: Operations for users and groups, favorites and tasks.
+- name: View and Zone Resources
+  description: Operations for resource record naming policies, DNS response policies,
+    zones and zone templates, and views.
+components:
+  schemas:
+    RADIUSAuthenticator:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Authenticator'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of authenticator.
+            enum:
+            - RADIUSAuthenticator
+          secondaryAuthenticator:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/Authenticator'
+          hostname:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The fully qualified domain name or IP address for the authenticator.
+            nullable: false
+            example: https://hostname.com
+          timeout:
+            type: string
+            description: The value that overrides the timeout setting used for authentication
+              requests sent to the RADIUS server.
+            nullable: false
+            example: PT6S
+          port:
+            maximum: 65535
+            minimum: 1
+            type: integer
+            description: The port number used for authenticating users against the
+              RADIUS server.
+            format: int32
+            nullable: false
+            example: 1812
+          retries:
+            maximum: 10
+            minimum: 1
+            type: integer
+            description: The number of times Address Manager attempts to retransmit
+              a failed authentication request sent to the RADIUS server.
+            format: int32
+            nullable: false
+            example: 1
+          sharedSecret:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The shared secret used to encrypt and decrypt packets between
+              the client and the server.
+            nullable: false
+            example: Shar3dS3cret!
+          authenticationProtocol:
+            type: string
+            description: The authentication protocol.
+            nullable: false
+            enum:
+            - CHAP
+            - PAP
+    TACACSPlusAuthenticatorPutRequestBody:
+      required:
+      - attributes
+      - authenticationProtocol
+      - hostname
+      - name
+      - port
+      - timeout
+      allOf:
+      - $ref: '#/components/schemas/TACACSPlusAuthenticator'
+    ConflictError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 409
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Conflict
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - DeploymentAlreadyQueued
+          - IpAddressConflictsWithSplitNetwork
+          - IpGroupConflictsWithSplitNetwork
+          - IpRangeConflictsWithSplitNetwork
+          - ResourceAlreadyExists
+          - ResourceConflictsWithOther
+          - StaleResourceState
+          - WorkflowRequestAlreadyPending
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    AddressManagerAuthenticatorResourceLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /authenticators/12345
+          nullable: false
+          readOnly: true
+        collection:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /authenticators
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    KerberosAuthenticator:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Authenticator'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of authenticator.
+            enum:
+            - KerberosAuthenticator
+          secondaryAuthenticator:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedAuthenticator'
+          hostname:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The fully qualified domain name or IP address for the authenticator.
+            nullable: false
+            example: https://hostname.com
+          realm:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The administrative domain for the Kerberos server.
+            nullable: false
+            example: DOMAIN.COM
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 400
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Bad Request
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerConfigurationError
+          - ActiveServerMissingHaBackbone
+          - AddressHasLinkedRecords
+          - AddressIsBroadcastAddress
+          - AddressIsNetworkId
+          - AddressIsNetworkRouterAnycast
+          - AddressIsReserved
+          - AddressNotInNetwork
+          - AddressNotInRestrictedRanges
+          - AddressProtocolMatch
+          - AddressProtocolMismatch
+          - ArrayFieldSizeTooBig
+          - ArrayFieldSizeTooSmall
+          - AuthenticatorMismatch
+          - BlankFieldValue
+          - BrokenMandatoryDependency
+          - BrokenOptionalDependency
+          - CannotAssociateServerAssignedOption
+          - CannotEnableSso
+          - CannotFailoverWhileNodesDisconnected
+          - CannotFetchGroupsFromLdapAuthenticator
+          - ConflictingFieldsList
+          - ConflictingOrderBySortDirections
+          - ConflictingResourceFieldValues
+          - CreateUpdateNetworkGatewayNotSupported
+          - DatabaseNotInReplicatedState
+          - DatabaseReplicationInProgress
+          - DedicatedManagementNotEnabled
+          - DeleteAuthenticatorNotAllowed
+          - DeploymentFailedToStart
+          - DhcpDeploymentValidationNotEnabled
+          - DnsDeploymentValidationNotEnabled
+          - DuplicateFieldValue
+          - DuplicateFilterField
+          - DuplicateOrderByField
+          - DuplicateOrderByOperator
+          - DurationValueNotDivisibleBy
+          - DurationValueOutsideRange
+          - EmptyFieldValue
+          - EmptyRequestBody
+          - FailoverTargetAlreadyPrimaryServer
+          - FieldsParseError
+          - FieldsTokenError
+          - FieldHasPatchOnlyUpdate
+          - FieldNotPatchable
+          - FieldValueTooSmall
+          - FilterNeedsRefinement
+          - FilterParseError
+          - FilterTokenError
+          - ImportInProgress
+          - IncompatibleServerProfile
+          - IncompatibleServerVersion
+          - InterfaceRedundancyConfigurationError
+          - InvalidAnycastAddress
+          - InvalidAsciiString
+          - InvalidCsv
+          - InvalidDateValue
+          - InvalidDnsFeedLicense
+          - InvalidDuidValue
+          - InvalidDurationValue
+          - InvalidEmailAddress
+          - InvalidBase64Value
+          - InvalidEnumValue
+          - InvalidEnumZoneAbsoluteNameLength
+          - InvalidEnumZoneName
+          - InvalidFieldName
+          - InvalidFieldPath
+          - InvalidFileCharacterEncoding
+          - InvalidFileContentDisposition
+          - InvalidFileDataValue
+          - InvalidFilterAddress
+          - InvalidFilterAddressRange
+          - InvalidFilterAddressRangeSize
+          - InvalidFilterCountsAndPercentages
+          - InvalidFilterDate
+          - InvalidFilterEnumValue
+          - InvalidFilterField
+          - InvalidFilterMacAddress
+          - InvalidFilterPartialAddress
+          - InvalidFilterPercentage
+          - InvalidFilterValue
+          - InvalidFilterValueType
+          - InvalidFullyQualifiedDomainName
+          - InvalidFullyQualifiedDomainNameField
+          - InvalidGatewayMountPointValue
+          - InvalidHeaderValue
+          - InvalidInlinedResource
+          - InvalidIpv4AddressValue
+          - InvalidIpv4LoopbackPrefixLength
+          - InvalidIpv4RangeValue
+          - InvalidIpv6AddressValue
+          - InvalidIpv6BlockPrefixLength
+          - InvalidIpv6LoopbackPrefixLength
+          - InvalidIpv6NetworkPrefixLength
+          - InvalidIpv6RangeValue
+          - InvalidIpAddressState
+          - InvalidIpAddressValue
+          - InvalidIpAddressOrFullyQualifiedDomainNameValue
+          - InvalidIpBlockValue
+          - InvalidIpRangeValue
+          - InvalidLdapGroupName
+          - InvalidLimitParameterValue
+          - InvalidLocationCode
+          - InvalidMacAddressValue
+          - InvalidMatchCriteria
+          - InvalidMoveDestination
+          - InvalidNumberZoneAbsoluteNameLength
+          - InvalidNtpServerAddressForStratum
+          - InvalidOffsetParameterValue
+          - InvalidPaginationParameter
+          - InvalidPartialMacAddressFilter
+          - InvalidPolicyItemNameValue
+          - InvalidPrivateKeyValue
+          - InvalidQueryParameterValue
+          - InvalidRegularExpression
+          - InvalidResourceFieldValue
+          - InvalidResourceId
+          - InvalidResourceRecordData
+          - InvalidResourceType
+          - InvalidRetentionRestrictions
+          - InvalidServerPatchFile
+          - InvalidSplitPointAddress
+          - InvalidStartEndDates
+          - InvalidStringCharacters
+          - InvalidStringFieldPrefix
+          - InvalidTrustRelationshipCredentials
+          - InvalidTopLevelMerge
+          - InvalidTtlValue
+          - InvalidUdfDateValue
+          - InvalidUdfDefaultValue
+          - InvalidUdfEmailValue
+          - InvalidUdfNumberValue
+          - InvalidUdfPredefinedValue
+          - InvalidUdfPredefinedValues
+          - InvalidUdfUrlValue
+          - InvalidUdfValidationProperties
+          - InvalidUdfValue
+          - InvalidUidValue
+          - InvalidUndoTransactionId
+          - InvalidUrlScheme
+          - InvalidUrlValue
+          - InvalidX509CertificateValue
+          - InvalidZoneName
+          - IpRangeBroadcastOrNetworkIdAssigned
+          - IpRangeDoesNotOverlap
+          - IpRangeExcludesAssignedAddresses
+          - IpRangeExcludesChildRanges
+          - IpRangeExcludesDhcpRanges
+          - IpRangeExcludesGateway
+          - IpRangeIncludesGateway
+          - IpRangeNotAlignedOnRangeBoundary
+          - IpRangeOutsideNetworkBlockBoundary
+          - IpRangeOutsideParent
+          - IpRangeOverlapsSiblings
+          - IpRangeOverlapsRangeInOtherConfiguration
+          - IpRangePartiallyIncludesChildRanges
+          - IpRangeTooBig
+          - IpRangeTooSmall
+          - JsonDeserializationError
+          - JsonParseError
+          - JsonFieldParseError
+          - MacAddressInUse
+          - MismatchedLocationCodeParent
+          - MismatchedManagementAndServicesInterfaces
+          - MismatchedMergeTypes
+          - MissingMandatoryChangeControlComment
+          - MissingMergeDestinationInSiblings
+          - MissingPatchableField
+          - MissingQueryParameter
+          - MissingRequiredDeploymentRoleInterface
+          - MissingRequiredField
+          - MissingRequiredFilterField
+          - MissingRequiredFilterPredicate
+          - MoveAddressUnsupportedState
+          - MoveRolesWithOptionsOnServer
+          - MultipleBgpNeighborsNotSupported
+          - MultipleQueryParameterValues
+          - MultipleValuesNotAllowed
+          - NamingPolicyViolation
+          - NamingPolicyRestrictionViolation
+          - NetworkInterfaceNotConfigured
+          - NothingToDeployForUser
+          - NoAssignedDeploymentRoles
+          - NoHsmConfiguration
+          - NoKeyDistributionCentersInRealm
+          - NoPreviousFullDeploymentForDifferential
+          - NoSpaceForAddress
+          - NoSpaceForBlock
+          - NoSpaceForNetwork
+          - NoSpaceForRange
+          - OrderByParseError
+          - OrderByTokenError
+          - PaginationNotSupported
+          - PassiveServerConfigurationError
+          - PassiveServerMissingHaBackbone
+          - PasswordFailedRequirements
+          - RedirectPolicyTypeDisabled
+          - ReplicatedServerLimitReached
+          - ReplicationOperationNotAllowed
+          - ResetServerServicesRequired
+          - ResourceFieldNotInConfiguration
+          - ResourceFieldNotInRestrictedZones
+          - ResourceHasCircularReference
+          - ResourceHasRecordsNotInZone
+          - ResourceNotInConfiguration
+          - ResourceNotInRestrictedZones
+          - ResourceNotInTemplate
+          - ResourceNotInView
+          - ServerCommandError
+          - ServerControlResetRequired
+          - ServerGroupNotMultiPrimary
+          - ServerGroupSizeLimitReached
+          - ServerHasAssignedDeploymentOptions
+          - ServerHasAssignedDeploymentRoles
+          - ServerIsDeploying
+          - ServerIsMultiPrimaryServerGroupMember
+          - ServerIsPassive
+          - ServerManagementAddressProtocolMismatch
+          - ServerNotActive
+          - ServerNotDisabled
+          - ServerNotManaged
+          - ServerNotStandaloneServer
+          - ServerNotTrusted
+          - ServerServiceInterfaceNameMismatch
+          - ServerSslHandshakeError
+          - SigningPolicyInUse
+          - SsoEnforcementRequirementsUnmet
+          - StringFieldTooBig
+          - StringFieldTooSmall
+          - TemplateApplicationFailedToStart
+          - TemplateNotAssigned
+          - TotalCountNotSupported
+          - TrustRelationshipLimitReached
+          - UdfPredefinedValueInUse
+          - UdfValidationPropertiesInUse
+          - UdfValueExceedsMaximumLength
+          - UdfValueLessThanMinimum
+          - UdfValueLessThanMinimumLength
+          - UdfValueOutsideRange
+          - UnsupportedAggregateOperator
+          - UnsupportedAggregateFilterOperator
+          - UnsupportedDeploymentOptionScope
+          - UnsupportedDeploymentRoleInterfaceType
+          - UnsupportedEmbeddableCollection
+          - UnsupportedEmbeddableResource
+          - UnsupportedFieldsOperatorForMediaType
+          - UnsupportedFilterOperator
+          - UnsupportedFilterOperatorForNullValue
+          - UnsupportedHeaderEncoding
+          - UnsupportedHeaderValue
+          - UnsupportedImportFileType
+          - UnsupportedMultiPrimaryDeploymentOption
+          - UnsupportedOrderByField
+          - UnsupportedOrderByOperator
+          - UnsupportedResourceFieldValue
+          - UnsupportedResourceType
+          - UnsupportedServerCommand
+          - ValueLessThanMinimum
+          - ValueOutsideRange
+          - WorkflowRequestNotPending
+          - WrongCsvRowFieldCount
+          - WrongResourceType
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    KerberosAuthenticatorPutRequestBody:
+      required:
+      - hostname
+      - name
+      - realm
+      allOf:
+      - $ref: '#/components/schemas/KerberosAuthenticator'
+    AddressManagerAuthenticator:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Authenticator'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of authenticator.
+            enum:
+            - AddressManagerAuthenticator
+          hostname:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The fully qualified domain name or IP address for the authenticator.
+            nullable: false
+            example: https://hostname.com
+    TACACSPlusAuthenticator:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Authenticator'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of authenticator.
+            enum:
+            - TACACSPlusAuthenticator
+          secondaryAuthenticator:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/Authenticator'
+          hostname:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The fully qualified domain name or IP address for the authenticator.
+            nullable: false
+            example: https://hostname.com
+          timeout:
+            type: string
+            description: The value that overrides the timeout setting used for authentication
+              requests sent to the TACACS+ server.
+            nullable: false
+            example: PT2S
+          port:
+            maximum: 65535
+            minimum: 1
+            type: integer
+            description: The TCP port number used for communication between the client
+              and server.
+            format: int32
+            nullable: false
+            example: 49
+          sharedSecret:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The shared secret used to encrypt and decrypt packets between
+              the client and the server.
+            nullable: false
+            example: Shar3dS3cret!
+          authenticationProtocol:
+            type: string
+            description: The authentication protocol.
+            nullable: false
+            enum:
+            - CHAP
+            - PAP
+          groupAttribute:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The special attribute used for the custom service in the
+              TACACS+ server. This attribute is used to get the group name defined
+              in the TACACS+ server.
+            example: Example group
+          attributes:
+            type: array
+            nullable: false
+            items:
+              $ref: '#/components/schemas/NameValuePairBean'
+    SAMLIdentityProviderPutRequestBody:
+      required:
+      - emailAttribute
+      - enabled
+      - entityId
+      - groupAttribute
+      - name
+      - signOnUrl
+      - signingCertificate
+      allOf:
+      - $ref: '#/components/schemas/SAMLIdentityProvider'
+    X509Authenticator:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Authenticator'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of authenticator.
+            enum:
+            - X509Authenticator
+          secondaryAuthenticator:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/Authenticator'
+          primaryServerUrl:
+            type: string
+            description: The HTTP URL of the primary OCSP responder, used for testing
+              the status and validity of client certificates issued by the certificate
+              authority.
+            nullable: false
+          secondaryServerUrl:
+            type: string
+            description: The URL of the secondary OCSP responder. The server will
+              be contacted only if the primary cannot be contacted.
+          ldapUserMatchOption:
+            type: string
+            description: Indicates how matching of users in LDAP is performed. If
+              the value is CUSTOM_USER_PREFIX_MATCH, matching of users in LDAP will
+              be performed using the Subject CN from the client certificate and the
+              attribute specified in the User Prefix field of the LDAP authenticator.
+              If the value is STRICT_DN_MATCH, matching of users in LDAP will be performed
+              using the full Subject DN from the client certificate.
+            nullable: false
+            enum:
+            - NONE
+            - CUSTOM_USER_PREFIX_MATCH
+            - STRICT_DN_MATCH
+          caCertificates:
+            minItems: 1
+            type: array
+            nullable: false
+            items:
+              type: string
+              description: The certificate for the CA issuing client certificates.
+                If an issuing CA is an intermediate (or sub-) CA, the chain of CA
+                certificates up to and including a root CA must also be present. All
+                certificates must be  base64-encoded with any PEM headers removed.
+              format: byte
+    OAuthAuthorizationServerPutRequestBody:
+      required:
+      - emailClaim
+      - enabled
+      - groupClaim
+      - name
+      - userClaim
+      - validationMethod
+      allOf:
+      - $ref: '#/components/schemas/OAuthAuthorizationServer'
+    LDAPAuthenticator:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Authenticator'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of authenticator.
+            enum:
+            - LDAPAuthenticator
+          secondaryAuthenticator:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/Authenticator'
+          hostname:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The fully qualified domain name or IP address for the authenticator.
+            nullable: false
+            example: https://hostname.com
+          port:
+            maximum: 65535
+            minimum: 1
+            type: integer
+            description: The TCP port used for communication between Address Manager
+              and the default LDAP server.
+            format: int32
+            nullable: false
+            example: 1389
+          adminDn:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The distinguished name or relative distinguished name of
+              a user with rights to search the LDAP directory.
+            nullable: false
+            example: user1
+          adminPassword:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The password for the distinguished name or relative distinguished
+              name.
+            nullable: false
+            example: pass1
+          sslEnabled:
+            type: boolean
+            description: Determines whether SSL communication is enabled between Address
+              Manager and the LDAP server.
+            nullable: false
+          schemaType:
+            type: string
+            description: The type of LDAP schema.
+            nullable: false
+            enum:
+            - ACTIVE_DIRECTORY
+            - OPENLDAP
+            - OTHER_LDAP
+          searchBase:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The search base distinguished name location from which the
+              search for users on the LDAP server begins.
+            nullable: false
+            example: cn=users,dc=example,dc=com
+          userObjectClass:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The user object class used to locate an LDAP user.
+            nullable: false
+            example: person
+          groupObjectClass:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The group object class used to indicate that a DN is a group.
+            nullable: false
+            example: group
+          userPrefix:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The user attribute for user accounts in the LDAP tree.
+            nullable: false
+            example: samAccountName
+          emailPrefix:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The variable to be used for the email prefix.
+            nullable: false
+            example: userPrincipalName
+          memberOfPrefix:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The attribute used to store user-group membership information.
+            nullable: false
+            example: memberOf
+          referralPolicy:
+            type: string
+            description: The environment property that indicates how to handle referrals
+              from external resources to the service providers.
+            nullable: false
+            enum:
+            - IGNORE
+            - FOLLOW
+            - THROW
+          aliasDereferencePolicy:
+            type: string
+            description: The environment property that indicates whether alias entries
+              are dereferenced.
+            nullable: false
+            enum:
+            - ALWAYS
+            - NEVER
+            - FINDING
+            - SEARCHING
+    LDAPAuthenticatorPutRequestBody:
+      required:
+      - adminDn
+      - aliasDereferencePolicy
+      - emailPrefix
+      - groupObjectClass
+      - hostname
+      - memberOfPrefix
+      - name
+      - port
+      - referralPolicy
+      - schemaType
+      - searchBase
+      - sslEnabled
+      - userObjectClass
+      - userPrefix
+      allOf:
+      - $ref: '#/components/schemas/LDAPAuthenticator'
+    OAuthAuthorizationServer:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Authenticator'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of authenticator.
+            enum:
+            - OAuthAuthorizationServer
+          description:
+            type: string
+            description: The description of the authorization server.
+            example: OAuth server
+          enabled:
+            type: boolean
+            description: Indicates whether OAuth authentication is enabled.
+            nullable: false
+          userClaim:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The user claim name of the authorization server.
+            nullable: false
+            example: sub
+          groupClaim:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The group claim name of the authorization server.
+            nullable: false
+            example: group
+          emailClaim:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The email claim name of the authorization server.
+            nullable: false
+            example: email
+          validationMethod:
+            type: string
+            description: The method that indicates where the token validation occurs.
+            nullable: false
+            enum:
+            - AUTHORIZATION_SERVER
+            - LOCAL
+          clientId:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The public identifier of the application.
+            example: a1b2c3d4e5f6
+          clientSecret:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The client secret known only to the application and authorization
+              server.
+            example: 18a42498e37480952a1e7f412539f93ce0dfa042d57a95e3ce915516ead51a2
+          introspectionUrl:
+            type: string
+            description: The introspection endpoint that allows Address Manager to
+              check the validity of access tokens.
+            example: https://auth-server.com
+          userInfoUrl:
+            type: string
+            description: The endpoint containing information about the user, including
+              the group membership information and user ID.
+            example: https://auth-server.com/userinfo
+          authorizationOption:
+            type: string
+            description: The authorization method used when Address Manager sends
+              the client ID and client secret to the authorization server.
+            enum:
+            - BASIC
+            - POST
+          audience:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The name of the BAM API bearer token obtained from the authorization
+              server.
+          issuer:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The name of the token issuer.
+            example: https://auth-server.com
+          signingCertificate:
+            type: string
+            description: The authoritative server signing certificate.
+            format: byte
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 403
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Forbidden
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - AccessDenied
+          - CreateNotAllowed
+          - DeleteLastLinkNotAllowed
+          - DeleteLastStandbyServerNotAllowed
+          - DeleteNotAllowed
+          - DisableHaServerServiceNotSupported
+          - EnableHaServerServiceNotSupported
+          - FieldUpdateNotAllowed
+          - FileSizeTooBig
+          - InvalidAuthorizationScheme
+          - OperationNotPermitted
+          - ReadOnlySession
+          - ReadOnlySessionOnPrimary
+          - ResourceInUse
+          - ServerIsF5PoolMember
+          - ServerInReplication
+          - UpdateNotAllowed
+          - WorkflowRequestApproveDenyNotAllowed
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    RADIUSAuthenticatorPutRequestBody:
+      required:
+      - authenticationProtocol
+      - hostname
+      - name
+      - port
+      - retries
+      - timeout
+      allOf:
+      - $ref: '#/components/schemas/RADIUSAuthenticator'
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 401
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Unauthorized
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - InvalidAuthorizationCredentials
+          - InvalidServerPassword
+          - InvalidUsernameOrApiKey
+          - InvalidUsernameOrPassword
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 404
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Not Found
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerNotConnected
+          - CannotConnectToServer
+          - InlinedResourceNotFound
+          - NetworkNotFoundForAddress
+          - PassiveServerNotConnected
+          - ResourceNotFound
+          - ResourceFieldNotFound
+          - ServerGroupHasNoMembers
+          - ServerNotConnected
+          - ServerServiceInterfaceNotConnected
+          - WrongResourceCollection
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    SAMLIdentityProvider:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Authenticator'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of authenticator.
+            enum:
+            - SAMLIdentityProvider
+          secondaryAuthenticator:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/Authenticator'
+          description:
+            type: string
+            description: The description of the SAML IdP configuration.
+            example: IdP configuration
+          enabled:
+            type: boolean
+            description: Indicates whether SAML IdP authentication is enabled.
+            nullable: false
+          groupAttribute:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The attribute name for group in the SAML response.
+            nullable: false
+            example: http://schemas.xmlsoap.org/claims/Group
+          emailAttribute:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The attribute name for email in the SAML response.
+            nullable: false
+            example: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress
+          signOnUrl:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The sign-in URL of the SAMP IdP.
+            nullable: false
+            example: https://example-idp.com/SSORedirect/idp
+          logoutUrl:
+            type: string
+            description: The logout URL of the SAMP IdP.
+            example: https://example-idp.com/SSORedirect/logout
+          entityId:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The entity ID of the SAMP IdP.
+            nullable: false
+            example: example-idp.com
+          signingCertificate:
+            type: string
+            description: The SAML IdP server signing certificate.
+            format: byte
+            nullable: false
+    KerberosAuthenticatorResourceLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /authenticators/12345
+          nullable: false
+          readOnly: true
+        collection:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /authenticators
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    X509AuthenticatorPutRequestBody:
+      required:
+      - caCertificates
+      - ldapUserMatchOption
+      - name
+      - primaryServerUrl
+      allOf:
+      - $ref: '#/components/schemas/X509Authenticator'
+    Authenticator:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The type of authenticator.
+          enum:
+          - Authenticator
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name for the authenticator.
+          nullable: false
+          example: LDAP authenticator
+        userDefinedFields:
+          type: object
+          additionalProperties:
+            type: object
+          description: User-defined fields set for the resource.
+          example:
+            udf1: value1
+            udf2: value2
+      description: The authenticator that manages the user.
+      discriminator:
+        propertyName: type
+    InlinedAuthenticator:
+      title: Authenticator
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The type of authenticator.
+          enum:
+          - Authenticator
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name for the authenticator.
+          nullable: false
+          example: LDAP authenticator
+    NameValuePairBean:
+      type: object
+      properties:
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name for the value.
+          nullable: false
+          example: Test
+        value:
+          type: string
+          description: The value to be inserted.
+          example: Text
+      description: An attribute-value pair defined for the custom service in the TACACS+
+        server.
+  parameters:
+    id:
+      name: id
+      in: path
+      description: The ID of the resource.
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+    x-bcn-change-control-comment:
+      name: x-bcn-change-control-comment
+      in: header
+      description: The change control comment.
+      required: false
+      schema:
+        type: string
+        example: ''
+    fields:
+      name: fields
+      in: query
+      description: The subset of response resource field paths.
+      required: false
+      schema:
+        type: string

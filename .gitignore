@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.json
+htmlcov/
+.tox/
+.hypothesis/
+
+# Auto-generated directories
+.changelogs/
+.checkpoints/
+.cache/
+.self_test_cache/
+.selftest_resolver_cache/
+rollbacks/
+
+# Cache database files
+*.db
+cache.db
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Configuration files with credentials
+config.yaml
+config.yml
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,*view_path,*zone_name,name,cname,ttl,description
+1,alias_record,create,Default,Internal,example.local,db,db-server-01.example.local,3600,Database alias
+2,alias_record,create,Default,Internal,example.local,app,app-server-01.example.local,3600,Application alias
+3,alias_record,create,Default,Internal,example.local,app2,app-server-02.example.local,3600,Secondary app alias

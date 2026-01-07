@@ -1,0 +1,6 @@
+*row_id,*object_type,*action,*config,*address,name,mac,description,state,location_code
+1,ip6_address,create,Default,2001:db8:1::10,ipv6-server-01,00:50:56:01:01:01,Primary IPv6 application server,STATIC,
+2,ip6_address,create,Default,2001:db8:1::11,ipv6-server-02,00:50:56:01:01:02,Secondary IPv6 application server,STATIC,
+3,ip6_address,create,Default,2001:db8:1::20,ipv6-web-server,00:50:56:01:01:10,IPv6 web server,STATIC,
+4,ip6_address,create,Default,2001:db8:2::100,ipv6-dev-server,00:50:56:02:01:01,IPv6 development server,DHCP_RESERVED,
+

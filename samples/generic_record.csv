@@ -1,0 +1,10 @@
+*row_id,*object_type,*action,*config,*view_path,*zone_name,name,record_type,rdata,ttl,description
+1,generic_record,create,Default,Internal,example.local,example.local,CAA,0 issue letsencrypt.org,3600,CA authorization for Let's Encrypt
+2,generic_record,create,Default,Internal,example.local,example.local,CAA,0 issue digicert.com,3600,CA authorization for DigiCert
+3,generic_record,create,Default,Internal,example.local,example.local,CAA,0 iodef mailto:security@example.local,3600,CAA incident reporting
+4,generic_record,create,Default,Internal,example.local,_443._tcp.www,TLSA,3 1 1 2bb183af273adee539d39a9ee56c5234e8e98d4d3f7e5b6c0a8f30b6a1111111,3600,DANE TLSA for HTTPS
+5,generic_record,create,Default,Internal,example.local,subdomain,DS,12345 8 2 ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789,3600,DNSSEC delegation signer
+6,generic_record,create,Default,Internal,example.local,subdomain,NS,ns1.example.local.,3600,NS delegation record
+7,generic_record,create,Default,Internal,example.local,subdomain,NS,ns2.example.local.,3600,NS delegation record (secondary)
+8,generic_record,create,Default,Internal,example.local,_dmarc,TXT,v=DMARC1; p=reject; rua=mailto:dmarc@example.local,3600,DMARC policy record
+9,generic_record,create,Default,Internal,example.local,example.local,SPF,v=spf1 mx a:mail.example.local -all,3600,SPF sender policy framework

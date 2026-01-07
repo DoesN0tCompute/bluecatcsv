@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,name,*config,*network_path,roleType,*interfaces
+1,dhcp_deployment_role,create,Production-DHCP-Primary,Default,10.1.1.0/24,PRIMARY,server1
+2,dhcp_deployment_role,create,Production-DHCP-Failover,Default,10.1.2.0/24,PRIMARY,server1|server2
+3,dhcp_deployment_role,create,Development-DHCP,Default,10.1.10.0/24,PRIMARY,server2

@@ -1,0 +1,1020 @@
+openapi: 3.0.1
+info:
+  title: BlueCat Address Manager RESTful v2 API
+  description: 'The **BlueCat Address Manager RESTful v2 API** is a new RESTful API
+    for Address Manager that presents Address Manager objects as resources. Each resource
+    has a unique endpoint, and related resources are grouped in collections. To fetch
+    an individual resource, a `GET` request is sent to the resource''s endpoint. To
+    fetch all resources in a collection, a `GET` request is sent to the collection''s
+    endpoint.
+
+
+    The RESTful v2 API is [hypermedia driven](https://en.wikipedia.org/wiki/HATEOAS)
+    and uses the [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language)
+    format for representing links. When navigating through the API, you can use those
+    links to navigate to related resources or child resources of the requested endpoint.
+    The API supports the following media types for most endpoints:  `application/hal+json`,
+    `application/json`, and `text/csv`.  For authentication, the API supports both
+    `Basic` and `Bearer` HTTP authentication schemes.
+
+
+    To get started, create a session and receive credentials for `Basic` authentication
+    by sending a `POST` request to the [/sessions](#/User%20and%20Group%20Resources/postSession)
+    endpoint, with a message body containing the user''s credentials:
+
+
+    ```{"username":"apiuser", "password":"apipass"}```
+
+
+    The response will contain an `apiToken` field that can be entered with the username
+    in the Swagger UI **Authorize** dialog. The response will also contain a `basicAuthenticationCredentials`
+    field containing a base64 encoding of the requester''s username and API token
+    delimited by a colon. This string can be injected directly into request `Authorization`
+    headers in the following format:
+
+
+    ```Authorization: Basic YXBpOlQ0OExOT3VIRGhDcnVBNEo1bGFES3JuS3hTZC9QK3pjczZXTzBJMDY=```
+
+
+    For full details on API format and authentication methods, refer to the Address
+    Manager RESTful v2 API Guide on the BlueCat Documentation Portal.'
+  termsOfService: https://docs.bluecatnetworks.com/r/Terms-and-Conditions/Terms-and-Conditions
+  contact:
+    name: BlueCat Customer Care
+    url: https://care.bluecatnetworks.com/
+  license:
+    name: BlueCat License Agreements
+    url: https://bluecatnetworks.com/license-agreements/
+  version: 9.6.0
+paths:
+  /api/v2/signingPolicies:
+    get:
+      tags:
+      - DNSSEC Resources
+      summary: Retrieve a collection of signing policies
+      description: Retrieve a collection of all DNSSEC signing policies.
+      operationId: getSigningPolicies
+      parameters:
+      - $ref: '#/components/parameters/fields'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/filter'
+      - $ref: '#/components/parameters/orderBy'
+      - $ref: '#/components/parameters/total'
+      responses:
+        '200':
+          description: The root collection of signing policies
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                properties:
+                  _links:
+                    $ref: '#/components/schemas/DNSSECSigningPolicyCollectionHalLinks'
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      allOf:
+                      - $ref: '#/components/schemas/DNSSECSigningPolicy'
+                      - type: object
+                        properties:
+                          _links:
+                            $ref: '#/components/schemas/DNSSECSigningPolicyResourceLinks'
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      $ref: '#/components/schemas/DNSSECSigningPolicy'
+            text/csv:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    post:
+      tags:
+      - DNSSEC Resources
+      summary: Create a new signing policy
+      description: Create a new DNSSEC signing policy. DNSSEC signing policies simplify
+        administration by allowing you to configure DNSSEC settings in one place,
+        and then apply the policy to forward and reverse zones. A DNSSEC signing policy
+        contains all of the parameters needed to define the Key Signing Key and Zone
+        Signing Key for a zone, including the settings for automatic key rollover.
+      operationId: postSigningPolicy
+      parameters:
+      - $ref: '#/components/parameters/x-bcn-change-control-comment'
+      requestBody:
+        content:
+          application/hal+json:
+            schema:
+              $ref: '#/components/schemas/DNSSECSigningPolicyPostRequestBody'
+            examples:
+              signingPolicyExampleRequiredFields:
+                $ref: '#/components/examples/signingPolicyExampleRequiredFields'
+            encoding: {}
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DNSSECSigningPolicyPostRequestBody'
+            examples:
+              signingPolicyExampleRequiredFields:
+                $ref: '#/components/examples/signingPolicyExampleRequiredFields'
+            encoding: {}
+      responses:
+        '201':
+          description: The newly created signing policy
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/hal+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/DNSSECSigningPolicy'
+                - type: object
+                  properties:
+                    _links:
+                      $ref: '#/components/schemas/DNSSECSigningPolicyResourceLinks'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DNSSECSigningPolicy'
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+security:
+- basicAuthentication: []
+- bearerToken: []
+tags:
+- name: Administrator Resources
+  description: Operations for access rights, configurations, imports, password policies,
+    server patches, services, settings,  user-defined field definitions, user-defined
+    link definitions and workflow requests.
+- name: Authenticator Resources
+  description: Operations for authenticators, Kerberos realms, service principals
+    and key distribution centers.
+- name: Database Management and Replication Resources
+  description: Operations for database replication, database backups and trust relationships.
+- name: Deployment Option Resources
+  description: Operations for deployment options, deployment option definitions, access
+    control lists and match elements.
+- name: Deployment Role Resources
+  description: Operations for deployment roles.
+- name: Device Resources
+  description: Operations for devices, device types and subtypes.
+- name: DHCP Resources
+  description: Operations for DHCP client classes and subclasses, DHCP zone groups
+    and zone declarations, DHCP deployment option definitions and  DHCP vendor profiles.
+- name: DNSSEC Resources
+  description: Operations for DNSSEC signing policies and key management, and TSIG
+    zone signing keys.
+- name: IPv4 and IPv6 Resources
+  description: Operations for addresses, blocks, IP groups, leases, networks, DHCP
+    ranges, IP reconciliation policies and discovered devices, and IP templates.
+- name: Location Resources
+  description: Operations for locations and annotated resources
+- name: MAC Address and Client Identifier Resources
+  description: Operations for DHCP client identifiers, DHCP unique identifiers, MAC
+    addresses and MAC address pools.
+- name: Monitoring Resources
+  description: Operations for events, logs, notification groups, reports and report
+    schedules, transactions, and user sessions.
+- name: Resource Record Resources
+  description: Operations for resource records.
+- name: Server Resources
+  description: Operations for deployments and deployment schedules, interfaces, servers,
+    server groups, server services.
+- name: Tag Resources
+  description: Operations for tags, tag groups, and tagged resources.
+- name: TFTP Resources
+  description: Operations for TFTP groups and files.
+- name: User and Group Resources
+  description: Operations for users and groups, favorites and tasks.
+- name: View and Zone Resources
+  description: Operations for resource record naming policies, DNS response policies,
+    zones and zone templates, and views.
+components:
+  schemas:
+    CollectionCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    DNSSECSigningPolicy:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - DNSSECSigningPolicy
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+        userDefinedFields:
+          type: object
+          additionalProperties:
+            type: object
+          description: User-defined fields set for the resource.
+          example:
+            udf1: value1
+            udf2: value2
+        keyProvider:
+          type: string
+          description: The system that created the DNSSEC signing key.
+          nullable: false
+          enum:
+          - ADDRESS_MANAGER
+        signatureDigestAlgorithm:
+          type: string
+          description: The algorithm used for the Delegation Signer (DS) record.
+          nullable: false
+          enum:
+          - SHA1
+          - SHA256
+          - SHA384
+        signatureValidityPeriod:
+          type: string
+          description: The duration for which the RRSIG resource record is valid.
+          nullable: false
+          example: PT240H
+        signatureResigningPeriod:
+          type: string
+          description: The duration before the end of the signature validity period
+            at which BIND resigns the zone.
+          nullable: false
+          example: PT48H
+        zoneSigningKeyAlgorithm:
+          type: string
+          description: The algorithm for the Zone Signing Key (ZSK).
+          nullable: false
+          enum:
+          - ECDSAP256SHA256
+          - ECDSAP384SHA384
+          - ED25519
+          - ED448
+          - RSAMD5
+          - RSANSEC3SHA256
+          - RSANSEC3SHA512
+          - RSASHA1
+          - RSASHA1NSEC3SHA1
+          - RSASHA256
+          - RSASHA512
+        zoneSigningKeyLength:
+          type: integer
+          description: The length of the zone signing key in bits.
+          format: int32
+          nullable: false
+          example: 384
+        zoneSigningKeyOverrideTtl:
+          type: string
+          description: The overridden TTL value of the zone signing key.
+          example: PT24H
+        zoneSigningKeyValidityPeriod:
+          type: string
+          description: The duration for which the zone signing key is valid.
+          nullable: false
+          example: PT720H
+        zoneSigningKeyOverlapPeriod:
+          type: string
+          description: The duration before the end of the validity period at which
+            a new key is generated for key rollover.
+          nullable: false
+          example: PT168H
+        zoneSigningKeyRolloverMethod:
+          type: string
+          description: The method to make the new zone signing key available when
+            the key rolls over.
+          nullable: false
+          enum:
+          - DOUBLE_SIGNING
+          - PRE_PUBLISH
+        zoneSigningKeySigningPeriod:
+          type: string
+          description: The duration before the end of the key validity period. During
+            this time, the resource records in the zone are simultaneously signed
+            by the new key and unsigned by the old key.
+          example: PT72H
+        zoneSigningKeyProtectionType:
+          type: string
+          description: The zone signing key protection type when Enstrust HSM is configured
+            as the key provider.
+          enum:
+          - MODULE
+        keySigningKeyAlgorithm:
+          type: string
+          description: The algorithm for the key signing key (KSK).
+          nullable: false
+          enum:
+          - ECDSAP256SHA256
+          - ECDSAP384SHA384
+          - ED25519
+          - ED448
+          - RSAMD5
+          - RSANSEC3SHA256
+          - RSANSEC3SHA512
+          - RSASHA1
+          - RSASHA1NSEC3SHA1
+          - RSASHA256
+          - RSASHA512
+        keySigningKeyLength:
+          type: integer
+          description: The length of the key signing key in bits.
+          format: int32
+          nullable: false
+          example: 384
+        keySigningKeyOverrideTtl:
+          type: string
+          description: The overridden TTL value of the key signing key.
+          example: PT24H
+        keySigningKeyValidityPeriod:
+          type: string
+          description: The duration for which the key signing key is valid.
+          nullable: false
+          example: PT8640H
+        keySigningKeyOverlapPeriod:
+          type: string
+          description: The duration before the end of the validity period at which
+            a new key is generated for key rollover.
+          nullable: false
+          example: PT336H
+        keySigningKeyRolloverMethod:
+          type: string
+          description: The method to make the new key signing key available when the
+            key rolls over.
+          nullable: false
+          enum:
+          - DOUBLE_SIGNING
+          - PRE_PUBLISH
+        keySigningKeySigningPeriod:
+          type: string
+          description: The duration before the end of the key validity period. During
+            this time, the resource records in the keys are simultaneously signed
+            by the new key and unsigned by the old key.
+          example: PT96H
+        keySigningKeyProtectionType:
+          type: string
+          description: The key signing key protection type when Enstrust HSM is configured
+            as the key provider.
+          enum:
+          - MODULE
+      description: The name of the DNSSEC signing policy associated with the IPv4
+        block.
+    ConflictError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 409
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Conflict
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - DeploymentAlreadyQueued
+          - IpAddressConflictsWithSplitNetwork
+          - IpGroupConflictsWithSplitNetwork
+          - IpRangeConflictsWithSplitNetwork
+          - ResourceAlreadyExists
+          - ResourceConflictsWithOther
+          - StaleResourceState
+          - WorkflowRequestAlreadyPending
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 400
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Bad Request
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerConfigurationError
+          - ActiveServerMissingHaBackbone
+          - AddressHasLinkedRecords
+          - AddressIsBroadcastAddress
+          - AddressIsNetworkId
+          - AddressIsNetworkRouterAnycast
+          - AddressIsReserved
+          - AddressNotInNetwork
+          - AddressNotInRestrictedRanges
+          - AddressProtocolMatch
+          - AddressProtocolMismatch
+          - ArrayFieldSizeTooBig
+          - ArrayFieldSizeTooSmall
+          - AuthenticatorMismatch
+          - BlankFieldValue
+          - BrokenMandatoryDependency
+          - BrokenOptionalDependency
+          - CannotAssociateServerAssignedOption
+          - CannotEnableSso
+          - CannotFailoverWhileNodesDisconnected
+          - CannotFetchGroupsFromLdapAuthenticator
+          - ConflictingFieldsList
+          - ConflictingOrderBySortDirections
+          - ConflictingResourceFieldValues
+          - CreateUpdateNetworkGatewayNotSupported
+          - DatabaseNotInReplicatedState
+          - DatabaseReplicationInProgress
+          - DedicatedManagementNotEnabled
+          - DeleteAuthenticatorNotAllowed
+          - DeploymentFailedToStart
+          - DhcpDeploymentValidationNotEnabled
+          - DnsDeploymentValidationNotEnabled
+          - DuplicateFieldValue
+          - DuplicateFilterField
+          - DuplicateOrderByField
+          - DuplicateOrderByOperator
+          - DurationValueNotDivisibleBy
+          - DurationValueOutsideRange
+          - EmptyFieldValue
+          - EmptyRequestBody
+          - FailoverTargetAlreadyPrimaryServer
+          - FieldsParseError
+          - FieldsTokenError
+          - FieldHasPatchOnlyUpdate
+          - FieldNotPatchable
+          - FieldValueTooSmall
+          - FilterNeedsRefinement
+          - FilterParseError
+          - FilterTokenError
+          - ImportInProgress
+          - IncompatibleServerProfile
+          - IncompatibleServerVersion
+          - InterfaceRedundancyConfigurationError
+          - InvalidAnycastAddress
+          - InvalidAsciiString
+          - InvalidCsv
+          - InvalidDateValue
+          - InvalidDnsFeedLicense
+          - InvalidDuidValue
+          - InvalidDurationValue
+          - InvalidEmailAddress
+          - InvalidBase64Value
+          - InvalidEnumValue
+          - InvalidEnumZoneAbsoluteNameLength
+          - InvalidEnumZoneName
+          - InvalidFieldName
+          - InvalidFieldPath
+          - InvalidFileCharacterEncoding
+          - InvalidFileContentDisposition
+          - InvalidFileDataValue
+          - InvalidFilterAddress
+          - InvalidFilterAddressRange
+          - InvalidFilterAddressRangeSize
+          - InvalidFilterCountsAndPercentages
+          - InvalidFilterDate
+          - InvalidFilterEnumValue
+          - InvalidFilterField
+          - InvalidFilterMacAddress
+          - InvalidFilterPartialAddress
+          - InvalidFilterPercentage
+          - InvalidFilterValue
+          - InvalidFilterValueType
+          - InvalidFullyQualifiedDomainName
+          - InvalidFullyQualifiedDomainNameField
+          - InvalidGatewayMountPointValue
+          - InvalidHeaderValue
+          - InvalidInlinedResource
+          - InvalidIpv4AddressValue
+          - InvalidIpv4LoopbackPrefixLength
+          - InvalidIpv4RangeValue
+          - InvalidIpv6AddressValue
+          - InvalidIpv6BlockPrefixLength
+          - InvalidIpv6LoopbackPrefixLength
+          - InvalidIpv6NetworkPrefixLength
+          - InvalidIpv6RangeValue
+          - InvalidIpAddressState
+          - InvalidIpAddressValue
+          - InvalidIpAddressOrFullyQualifiedDomainNameValue
+          - InvalidIpBlockValue
+          - InvalidIpRangeValue
+          - InvalidLdapGroupName
+          - InvalidLimitParameterValue
+          - InvalidLocationCode
+          - InvalidMacAddressValue
+          - InvalidMatchCriteria
+          - InvalidMoveDestination
+          - InvalidNumberZoneAbsoluteNameLength
+          - InvalidNtpServerAddressForStratum
+          - InvalidOffsetParameterValue
+          - InvalidPaginationParameter
+          - InvalidPartialMacAddressFilter
+          - InvalidPolicyItemNameValue
+          - InvalidPrivateKeyValue
+          - InvalidQueryParameterValue
+          - InvalidRegularExpression
+          - InvalidResourceFieldValue
+          - InvalidResourceId
+          - InvalidResourceRecordData
+          - InvalidResourceType
+          - InvalidRetentionRestrictions
+          - InvalidServerPatchFile
+          - InvalidSplitPointAddress
+          - InvalidStartEndDates
+          - InvalidStringCharacters
+          - InvalidStringFieldPrefix
+          - InvalidTrustRelationshipCredentials
+          - InvalidTopLevelMerge
+          - InvalidTtlValue
+          - InvalidUdfDateValue
+          - InvalidUdfDefaultValue
+          - InvalidUdfEmailValue
+          - InvalidUdfNumberValue
+          - InvalidUdfPredefinedValue
+          - InvalidUdfPredefinedValues
+          - InvalidUdfUrlValue
+          - InvalidUdfValidationProperties
+          - InvalidUdfValue
+          - InvalidUidValue
+          - InvalidUndoTransactionId
+          - InvalidUrlScheme
+          - InvalidUrlValue
+          - InvalidX509CertificateValue
+          - InvalidZoneName
+          - IpRangeBroadcastOrNetworkIdAssigned
+          - IpRangeDoesNotOverlap
+          - IpRangeExcludesAssignedAddresses
+          - IpRangeExcludesChildRanges
+          - IpRangeExcludesDhcpRanges
+          - IpRangeExcludesGateway
+          - IpRangeIncludesGateway
+          - IpRangeNotAlignedOnRangeBoundary
+          - IpRangeOutsideNetworkBlockBoundary
+          - IpRangeOutsideParent
+          - IpRangeOverlapsSiblings
+          - IpRangeOverlapsRangeInOtherConfiguration
+          - IpRangePartiallyIncludesChildRanges
+          - IpRangeTooBig
+          - IpRangeTooSmall
+          - JsonDeserializationError
+          - JsonParseError
+          - JsonFieldParseError
+          - MacAddressInUse
+          - MismatchedLocationCodeParent
+          - MismatchedManagementAndServicesInterfaces
+          - MismatchedMergeTypes
+          - MissingMandatoryChangeControlComment
+          - MissingMergeDestinationInSiblings
+          - MissingPatchableField
+          - MissingQueryParameter
+          - MissingRequiredDeploymentRoleInterface
+          - MissingRequiredField
+          - MissingRequiredFilterField
+          - MissingRequiredFilterPredicate
+          - MoveAddressUnsupportedState
+          - MoveRolesWithOptionsOnServer
+          - MultipleBgpNeighborsNotSupported
+          - MultipleQueryParameterValues
+          - MultipleValuesNotAllowed
+          - NamingPolicyViolation
+          - NamingPolicyRestrictionViolation
+          - NetworkInterfaceNotConfigured
+          - NothingToDeployForUser
+          - NoAssignedDeploymentRoles
+          - NoHsmConfiguration
+          - NoKeyDistributionCentersInRealm
+          - NoPreviousFullDeploymentForDifferential
+          - NoSpaceForAddress
+          - NoSpaceForBlock
+          - NoSpaceForNetwork
+          - NoSpaceForRange
+          - OrderByParseError
+          - OrderByTokenError
+          - PaginationNotSupported
+          - PassiveServerConfigurationError
+          - PassiveServerMissingHaBackbone
+          - PasswordFailedRequirements
+          - RedirectPolicyTypeDisabled
+          - ReplicatedServerLimitReached
+          - ReplicationOperationNotAllowed
+          - ResetServerServicesRequired
+          - ResourceFieldNotInConfiguration
+          - ResourceFieldNotInRestrictedZones
+          - ResourceHasCircularReference
+          - ResourceHasRecordsNotInZone
+          - ResourceNotInConfiguration
+          - ResourceNotInRestrictedZones
+          - ResourceNotInTemplate
+          - ResourceNotInView
+          - ServerCommandError
+          - ServerControlResetRequired
+          - ServerGroupNotMultiPrimary
+          - ServerGroupSizeLimitReached
+          - ServerHasAssignedDeploymentOptions
+          - ServerHasAssignedDeploymentRoles
+          - ServerIsDeploying
+          - ServerIsMultiPrimaryServerGroupMember
+          - ServerIsPassive
+          - ServerManagementAddressProtocolMismatch
+          - ServerNotActive
+          - ServerNotDisabled
+          - ServerNotManaged
+          - ServerNotStandaloneServer
+          - ServerNotTrusted
+          - ServerServiceInterfaceNameMismatch
+          - ServerSslHandshakeError
+          - SigningPolicyInUse
+          - SsoEnforcementRequirementsUnmet
+          - StringFieldTooBig
+          - StringFieldTooSmall
+          - TemplateApplicationFailedToStart
+          - TemplateNotAssigned
+          - TotalCountNotSupported
+          - TrustRelationshipLimitReached
+          - UdfPredefinedValueInUse
+          - UdfValidationPropertiesInUse
+          - UdfValueExceedsMaximumLength
+          - UdfValueLessThanMinimum
+          - UdfValueLessThanMinimumLength
+          - UdfValueOutsideRange
+          - UnsupportedAggregateOperator
+          - UnsupportedAggregateFilterOperator
+          - UnsupportedDeploymentOptionScope
+          - UnsupportedDeploymentRoleInterfaceType
+          - UnsupportedEmbeddableCollection
+          - UnsupportedEmbeddableResource
+          - UnsupportedFieldsOperatorForMediaType
+          - UnsupportedFilterOperator
+          - UnsupportedFilterOperatorForNullValue
+          - UnsupportedHeaderEncoding
+          - UnsupportedHeaderValue
+          - UnsupportedImportFileType
+          - UnsupportedMultiPrimaryDeploymentOption
+          - UnsupportedOrderByField
+          - UnsupportedOrderByOperator
+          - UnsupportedResourceFieldValue
+          - UnsupportedResourceType
+          - UnsupportedServerCommand
+          - ValueLessThanMinimum
+          - ValueOutsideRange
+          - WorkflowRequestNotPending
+          - WrongCsvRowFieldCount
+          - WrongResourceType
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 403
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Forbidden
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - AccessDenied
+          - CreateNotAllowed
+          - DeleteLastLinkNotAllowed
+          - DeleteLastStandbyServerNotAllowed
+          - DeleteNotAllowed
+          - DisableHaServerServiceNotSupported
+          - EnableHaServerServiceNotSupported
+          - FieldUpdateNotAllowed
+          - FileSizeTooBig
+          - InvalidAuthorizationScheme
+          - OperationNotPermitted
+          - ReadOnlySession
+          - ReadOnlySessionOnPrimary
+          - ResourceInUse
+          - ServerIsF5PoolMember
+          - ServerInReplication
+          - UpdateNotAllowed
+          - WorkflowRequestApproveDenyNotAllowed
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 401
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Unauthorized
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - InvalidAuthorizationCredentials
+          - InvalidServerPassword
+          - InvalidUsernameOrApiKey
+          - InvalidUsernameOrPassword
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 404
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Not Found
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerNotConnected
+          - CannotConnectToServer
+          - InlinedResourceNotFound
+          - NetworkNotFoundForAddress
+          - PassiveServerNotConnected
+          - ResourceNotFound
+          - ResourceFieldNotFound
+          - ServerGroupHasNoMembers
+          - ServerNotConnected
+          - ServerServiceInterfaceNotConnected
+          - WrongResourceCollection
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    DNSSECSigningPolicyPostRequestBody:
+      required:
+      - keyProvider
+      - keySigningKeyAlgorithm
+      - keySigningKeyLength
+      - keySigningKeyOverlapPeriod
+      - keySigningKeyRolloverMethod
+      - keySigningKeyValidityPeriod
+      - name
+      - signatureDigestAlgorithm
+      - signatureResigningPeriod
+      - signatureValidityPeriod
+      - type
+      - zoneSigningKeyAlgorithm
+      - zoneSigningKeyLength
+      - zoneSigningKeyOverlapPeriod
+      - zoneSigningKeyRolloverMethod
+      - zoneSigningKeyValidityPeriod
+      allOf:
+      - $ref: '#/components/schemas/DNSSECSigningPolicy'
+    DNSSECSigningPolicyResourceLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /signingPolicies/12345
+          nullable: false
+          readOnly: true
+        collection:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /signingPolicies
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    CollectionTotalCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    DNSSECSigningPolicyCollectionHalLinks:
+      type: object
+      properties:
+        next:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/signingPolicies?offset=2000&limit=1000
+          nullable: false
+          readOnly: true
+        prev:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/signingPolicies?offset=0&limit=1000
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+  examples:
+    signingPolicyExampleRequiredFields:
+      summary: Create a DNSSEC signing policy
+      description: Creates a DNSSEC signing policy using Address Manager as the key
+        provider.
+      value:
+        name: example-policy
+        keyProvider: ADDRESS_MANAGER
+        signatureDigestAlgorithm: SHA256
+        signatureValidityPeriod: P10D
+        signatureResigningPeriod: P2D
+        zoneSigningKeyAlgorithm: RSASHA512
+        zoneSigningKeyLength: 2048
+        zoneSigningKeyValidityPeriod: P30D
+        zoneSigningKeyOverlapPeriod: P7D
+        zoneSigningKeyRolloverMethod: PRE_PUBLISH
+        zoneSigningKeySigningPeriod: P3D
+        keySigningKeyAlgorithm: RSASHA512
+        keySigningKeyLength: 2048
+        keySigningKeyValidityPeriod: P360D
+        keySigningKeyOverlapPeriod: P14D
+        keySigningKeyRolloverMethod: DOUBLE_SIGNING
+  headers:
+    Location:
+      description: The location of the resource
+      required: true
+      schema:
+        type: string
+  parameters:
+    x-bcn-change-control-comment:
+      name: x-bcn-change-control-comment
+      in: header
+      description: The change control comment.
+      required: false
+      schema:
+        type: string
+        example: ''
+    total:
+      name: total
+      in: query
+      description: Return the total number of resources matching the query.
+      required: false
+      schema:
+        type: boolean
+    offset:
+      name: offset
+      in: query
+      description: The offset of the first resource returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    orderBy:
+      name: orderBy
+      in: query
+      description: The field path to order the response resources by.
+      required: false
+      schema:
+        type: string
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of resources returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    filter:
+      name: filter
+      in: query
+      description: The query filter string.
+      required: false
+      schema:
+        type: string
+    fields:
+      name: fields
+      in: query
+      description: The subset of response resource field paths.
+      required: false
+      schema:
+        type: string

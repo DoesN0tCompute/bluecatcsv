@@ -1,0 +1,5 @@
+row_id,object_type,action,config,parent,cidr,name,address,mac,description
+ip4_block_1,ip4_block,create,Default,,10.200.1.0/24,Test-Block-1,,,Test block 1
+ip4_network_1,ip4_network,create,Default,/IPv4/10.200.1.0/24,10.200.1.0/28,Test-Network-1,,,Test network 1
+ip4_address_1,ip4_address,create,Default,/IPv4/10.200.1.0/28,,server-1,10.200.1.5,00:11:22:33:44:55,Test server 1
+ip4_address_2,ip4_address,update,Default,/IPv4/10.200.1.0/28,,server-1-updated,10.200.1.5,00:11:22:33:44:55,Updated server 1/Users/kanishk/Projects/bluecat-csv/tests/self-test-all-types.csv

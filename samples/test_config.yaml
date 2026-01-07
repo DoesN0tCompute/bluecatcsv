@@ -1,0 +1,21 @@
+bam:
+  base_url: http://192.168.40.23
+  username: admin
+  password: admin
+  api_version: v2
+  timeout: 30
+  verify_ssl: false
+
+logging:
+  level: INFO
+  format: structured
+
+execution:
+  max_retries: 3
+  retry_delay: 1.0
+  throttle_delay: 0.5
+  checkpoint_interval: 50
+  max_concurrent_requests: 10
+
+safety:
+  allow_dangerous_operations: false

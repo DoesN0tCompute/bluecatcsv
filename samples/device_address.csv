@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,device_name,address
+1,device_address,create,Default,core-switch-01,10.0.1.254
+2,device_address,create,Default,core-switch-01,10.0.2.254
+3,device_address,delete,Default,firewall-primary,10.0.2.1

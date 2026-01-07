@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,name,display_name,field_type,default_value,required,resource_types,predefined_values
+1,udf_definition,create,CostCenter,Cost Center,TEXT,,false,IPv4Network|IPv4Block,
+2,udf_definition,create,Owner,Owner Email,EMAIL,,false,*,
+3,udf_definition,create,Environment,Environment Type,TEXT,,false,IPv4Network,Development|Staging|Production

@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,*parent,*name,*range
+1,ip4_group,create,Default,/IPv4/10.0.0.0/8/10.1.1.0/24,DHCP-Pool,10.1.1.100-10.1.1.200
+2,ip4_group,create,Default,/IPv4/10.0.0.0/8/10.1.1.0/24,Reserved-IPs,10.1.1.1-10.1.1.10
+3,ip4_group,create,Default,/IPv4/10.0.0.0/8/10.1.2.0/24,Dev-Pool,10.1.2.50-10.1.2.150

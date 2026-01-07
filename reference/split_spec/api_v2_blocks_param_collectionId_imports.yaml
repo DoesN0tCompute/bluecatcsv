@@ -1,0 +1,1668 @@
+openapi: 3.0.1
+info:
+  title: BlueCat Address Manager RESTful v2 API
+  description: 'The **BlueCat Address Manager RESTful v2 API** is a new RESTful API
+    for Address Manager that presents Address Manager objects as resources. Each resource
+    has a unique endpoint, and related resources are grouped in collections. To fetch
+    an individual resource, a `GET` request is sent to the resource''s endpoint. To
+    fetch all resources in a collection, a `GET` request is sent to the collection''s
+    endpoint.
+
+
+    The RESTful v2 API is [hypermedia driven](https://en.wikipedia.org/wiki/HATEOAS)
+    and uses the [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language)
+    format for representing links. When navigating through the API, you can use those
+    links to navigate to related resources or child resources of the requested endpoint.
+    The API supports the following media types for most endpoints:  `application/hal+json`,
+    `application/json`, and `text/csv`.  For authentication, the API supports both
+    `Basic` and `Bearer` HTTP authentication schemes.
+
+
+    To get started, create a session and receive credentials for `Basic` authentication
+    by sending a `POST` request to the [/sessions](#/User%20and%20Group%20Resources/postSession)
+    endpoint, with a message body containing the user''s credentials:
+
+
+    ```{"username":"apiuser", "password":"apipass"}```
+
+
+    The response will contain an `apiToken` field that can be entered with the username
+    in the Swagger UI **Authorize** dialog. The response will also contain a `basicAuthenticationCredentials`
+    field containing a base64 encoding of the requester''s username and API token
+    delimited by a colon. This string can be injected directly into request `Authorization`
+    headers in the following format:
+
+
+    ```Authorization: Basic YXBpOlQ0OExOT3VIRGhDcnVBNEo1bGFES3JuS3hTZC9QK3pjczZXTzBJMDY=```
+
+
+    For full details on API format and authentication methods, refer to the Address
+    Manager RESTful v2 API Guide on the BlueCat Documentation Portal.'
+  termsOfService: https://docs.bluecatnetworks.com/r/Terms-and-Conditions/Terms-and-Conditions
+  contact:
+    name: BlueCat Customer Care
+    url: https://care.bluecatnetworks.com/
+  license:
+    name: BlueCat License Agreements
+    url: https://bluecatnetworks.com/license-agreements/
+  version: 9.6.0
+paths:
+  /api/v2/blocks/{collectionId}/imports:
+    get:
+      tags:
+      - IPv4 and IPv6 Resources
+      summary: Retrieve a collection of block and network imports
+      description: Retrieve all IPv4/IPv6 blocks and networks representing a resource
+        import.
+      operationId: getBlockImports
+      parameters:
+      - $ref: '#/components/parameters/fields'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/filter'
+      - $ref: '#/components/parameters/orderBy'
+      - $ref: '#/components/parameters/total'
+      - $ref: '#/components/parameters/collectionId'
+      responses:
+        '200':
+          description: The collection of block and network imports
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                properties:
+                  _links:
+                    $ref: '#/components/schemas/IPv4BlockImportCollectionHalLinks'
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      allOf:
+                      - oneOf:
+                        - $ref: '#/components/schemas/IPv4BlockImport'
+                        - $ref: '#/components/schemas/IPv4NetworkImport'
+                        - $ref: '#/components/schemas/IPv6BlockImport'
+                        - $ref: '#/components/schemas/IPv6NetworkImport'
+                      - type: object
+                        properties:
+                          _links:
+                            $ref: '#/components/schemas/IPv4BlockImportResourceLinks'
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      oneOf:
+                      - $ref: '#/components/schemas/IPv4BlockImport'
+                      - $ref: '#/components/schemas/IPv4NetworkImport'
+                      - $ref: '#/components/schemas/IPv6BlockImport'
+                      - $ref: '#/components/schemas/IPv6NetworkImport'
+            text/csv:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    post:
+      tags:
+      - IPv4 and IPv6 Resources
+      summary: Create a new block or network import
+      description: Create a resource representing an IPv4/IPv6 block or network import.
+      operationId: postBlockImport
+      parameters:
+      - $ref: '#/components/parameters/x-bcn-change-control-comment'
+      - name: x-bcn-no-gateway
+        in: header
+        description: Indicates whether the IPv4 network should not contain a gateway
+          address.
+        schema:
+          type: boolean
+          default: false
+      - name: x-bcn-traversal-method
+        in: header
+        description: 'The algorithm used to determine the starting address of the
+          block or network when only a size was provided for the `range` value. If
+          no header value is supplied, `NO_TRAVERSAL` will be used by default.
+
+          - `NO_TRAVERSAL`: Attempt to find the available space directly under the
+          specified parent block.
+
+          - `DEPTH_FIRST`: Attempt to find the available space by recursively searching
+          the parent block''s children.
+
+          '
+        schema:
+          type: string
+          default: NO_TRAVERSAL
+          enum:
+          - NO_TRAVERSAL
+          - DEPTH_FIRST
+      - $ref: '#/components/parameters/collectionId'
+      requestBody:
+        content:
+          text/csv:
+            schema:
+              discriminator:
+                propertyName: type
+                mapping:
+                  IPv4BlockImport: '#/components/schemas/IPv4BlockImportPostRequestBody'
+                  IPv4NetworkImport: '#/components/schemas/IPv4NetworkImportPostRequestBody'
+                  IPv6BlockImport: '#/components/schemas/IPv6BlockImportPostRequestBody'
+                  IPv6NetworkImport: '#/components/schemas/IPv6NetworkImportPostRequestBody'
+              oneOf:
+              - $ref: '#/components/schemas/IPv4BlockImportPostRequestBody'
+              - $ref: '#/components/schemas/IPv4NetworkImportPostRequestBody'
+              - $ref: '#/components/schemas/IPv6BlockImportPostRequestBody'
+              - $ref: '#/components/schemas/IPv6NetworkImportPostRequestBody'
+            examples:
+              importResourceExampleNetworkResourceImport:
+                $ref: '#/components/examples/importResourceExampleNetworkResourceImport'
+            encoding: {}
+      responses:
+        '201':
+          description: The newly created block or network import
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/hal+json:
+              schema:
+                allOf:
+                - oneOf:
+                  - $ref: '#/components/schemas/IPv4BlockImport'
+                  - $ref: '#/components/schemas/IPv4NetworkImport'
+                  - $ref: '#/components/schemas/IPv6BlockImport'
+                  - $ref: '#/components/schemas/IPv6NetworkImport'
+                - type: object
+                  properties:
+                    _links:
+                      $ref: '#/components/schemas/IPv4BlockImportResourceLinks'
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/IPv4BlockImport'
+                - $ref: '#/components/schemas/IPv4NetworkImport'
+                - $ref: '#/components/schemas/IPv6BlockImport'
+                - $ref: '#/components/schemas/IPv6NetworkImport'
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+security:
+- basicAuthentication: []
+- bearerToken: []
+tags:
+- name: Administrator Resources
+  description: Operations for access rights, configurations, imports, password policies,
+    server patches, services, settings,  user-defined field definitions, user-defined
+    link definitions and workflow requests.
+- name: Authenticator Resources
+  description: Operations for authenticators, Kerberos realms, service principals
+    and key distribution centers.
+- name: Database Management and Replication Resources
+  description: Operations for database replication, database backups and trust relationships.
+- name: Deployment Option Resources
+  description: Operations for deployment options, deployment option definitions, access
+    control lists and match elements.
+- name: Deployment Role Resources
+  description: Operations for deployment roles.
+- name: Device Resources
+  description: Operations for devices, device types and subtypes.
+- name: DHCP Resources
+  description: Operations for DHCP client classes and subclasses, DHCP zone groups
+    and zone declarations, DHCP deployment option definitions and  DHCP vendor profiles.
+- name: DNSSEC Resources
+  description: Operations for DNSSEC signing policies and key management, and TSIG
+    zone signing keys.
+- name: IPv4 and IPv6 Resources
+  description: Operations for addresses, blocks, IP groups, leases, networks, DHCP
+    ranges, IP reconciliation policies and discovered devices, and IP templates.
+- name: Location Resources
+  description: Operations for locations and annotated resources
+- name: MAC Address and Client Identifier Resources
+  description: Operations for DHCP client identifiers, DHCP unique identifiers, MAC
+    addresses and MAC address pools.
+- name: Monitoring Resources
+  description: Operations for events, logs, notification groups, reports and report
+    schedules, transactions, and user sessions.
+- name: Resource Record Resources
+  description: Operations for resource records.
+- name: Server Resources
+  description: Operations for deployments and deployment schedules, interfaces, servers,
+    server groups, server services.
+- name: Tag Resources
+  description: Operations for tags, tag groups, and tagged resources.
+- name: TFTP Resources
+  description: Operations for TFTP groups and files.
+- name: User and Group Resources
+  description: Operations for users and groups, favorites and tasks.
+- name: View and Zone Resources
+  description: Operations for resource record naming policies, DNS response policies,
+    zones and zone templates, and views.
+components:
+  parameters:
+    collectionId:
+      name: collectionId
+      in: path
+      description: The ID of the collection resource.
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+    x-bcn-change-control-comment:
+      name: x-bcn-change-control-comment
+      in: header
+      description: The change control comment.
+      required: false
+      schema:
+        type: string
+        example: ''
+    total:
+      name: total
+      in: query
+      description: Return the total number of resources matching the query.
+      required: false
+      schema:
+        type: boolean
+    offset:
+      name: offset
+      in: query
+      description: The offset of the first resource returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    orderBy:
+      name: orderBy
+      in: query
+      description: The field path to order the response resources by.
+      required: false
+      schema:
+        type: string
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of resources returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    filter:
+      name: filter
+      in: query
+      description: The query filter string.
+      required: false
+      schema:
+        type: string
+    fields:
+      name: fields
+      in: query
+      description: The subset of response resource field paths.
+      required: false
+      schema:
+        type: string
+  schemas:
+    IPv4BlockImportResourceLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /imports/12345
+          nullable: false
+          readOnly: true
+        collection:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /imports
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    CollectionCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    ConflictError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 409
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Conflict
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - DeploymentAlreadyQueued
+          - IpAddressConflictsWithSplitNetwork
+          - IpGroupConflictsWithSplitNetwork
+          - IpRangeConflictsWithSplitNetwork
+          - ResourceAlreadyExists
+          - ResourceConflictsWithOther
+          - StaleResourceState
+          - WorkflowRequestAlreadyPending
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 400
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Bad Request
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerConfigurationError
+          - ActiveServerMissingHaBackbone
+          - AddressHasLinkedRecords
+          - AddressIsBroadcastAddress
+          - AddressIsNetworkId
+          - AddressIsNetworkRouterAnycast
+          - AddressIsReserved
+          - AddressNotInNetwork
+          - AddressNotInRestrictedRanges
+          - AddressProtocolMatch
+          - AddressProtocolMismatch
+          - ArrayFieldSizeTooBig
+          - ArrayFieldSizeTooSmall
+          - AuthenticatorMismatch
+          - BlankFieldValue
+          - BrokenMandatoryDependency
+          - BrokenOptionalDependency
+          - CannotAssociateServerAssignedOption
+          - CannotEnableSso
+          - CannotFailoverWhileNodesDisconnected
+          - CannotFetchGroupsFromLdapAuthenticator
+          - ConflictingFieldsList
+          - ConflictingOrderBySortDirections
+          - ConflictingResourceFieldValues
+          - CreateUpdateNetworkGatewayNotSupported
+          - DatabaseNotInReplicatedState
+          - DatabaseReplicationInProgress
+          - DedicatedManagementNotEnabled
+          - DeleteAuthenticatorNotAllowed
+          - DeploymentFailedToStart
+          - DhcpDeploymentValidationNotEnabled
+          - DnsDeploymentValidationNotEnabled
+          - DuplicateFieldValue
+          - DuplicateFilterField
+          - DuplicateOrderByField
+          - DuplicateOrderByOperator
+          - DurationValueNotDivisibleBy
+          - DurationValueOutsideRange
+          - EmptyFieldValue
+          - EmptyRequestBody
+          - FailoverTargetAlreadyPrimaryServer
+          - FieldsParseError
+          - FieldsTokenError
+          - FieldHasPatchOnlyUpdate
+          - FieldNotPatchable
+          - FieldValueTooSmall
+          - FilterNeedsRefinement
+          - FilterParseError
+          - FilterTokenError
+          - ImportInProgress
+          - IncompatibleServerProfile
+          - IncompatibleServerVersion
+          - InterfaceRedundancyConfigurationError
+          - InvalidAnycastAddress
+          - InvalidAsciiString
+          - InvalidCsv
+          - InvalidDateValue
+          - InvalidDnsFeedLicense
+          - InvalidDuidValue
+          - InvalidDurationValue
+          - InvalidEmailAddress
+          - InvalidBase64Value
+          - InvalidEnumValue
+          - InvalidEnumZoneAbsoluteNameLength
+          - InvalidEnumZoneName
+          - InvalidFieldName
+          - InvalidFieldPath
+          - InvalidFileCharacterEncoding
+          - InvalidFileContentDisposition
+          - InvalidFileDataValue
+          - InvalidFilterAddress
+          - InvalidFilterAddressRange
+          - InvalidFilterAddressRangeSize
+          - InvalidFilterCountsAndPercentages
+          - InvalidFilterDate
+          - InvalidFilterEnumValue
+          - InvalidFilterField
+          - InvalidFilterMacAddress
+          - InvalidFilterPartialAddress
+          - InvalidFilterPercentage
+          - InvalidFilterValue
+          - InvalidFilterValueType
+          - InvalidFullyQualifiedDomainName
+          - InvalidFullyQualifiedDomainNameField
+          - InvalidGatewayMountPointValue
+          - InvalidHeaderValue
+          - InvalidInlinedResource
+          - InvalidIpv4AddressValue
+          - InvalidIpv4LoopbackPrefixLength
+          - InvalidIpv4RangeValue
+          - InvalidIpv6AddressValue
+          - InvalidIpv6BlockPrefixLength
+          - InvalidIpv6LoopbackPrefixLength
+          - InvalidIpv6NetworkPrefixLength
+          - InvalidIpv6RangeValue
+          - InvalidIpAddressState
+          - InvalidIpAddressValue
+          - InvalidIpAddressOrFullyQualifiedDomainNameValue
+          - InvalidIpBlockValue
+          - InvalidIpRangeValue
+          - InvalidLdapGroupName
+          - InvalidLimitParameterValue
+          - InvalidLocationCode
+          - InvalidMacAddressValue
+          - InvalidMatchCriteria
+          - InvalidMoveDestination
+          - InvalidNumberZoneAbsoluteNameLength
+          - InvalidNtpServerAddressForStratum
+          - InvalidOffsetParameterValue
+          - InvalidPaginationParameter
+          - InvalidPartialMacAddressFilter
+          - InvalidPolicyItemNameValue
+          - InvalidPrivateKeyValue
+          - InvalidQueryParameterValue
+          - InvalidRegularExpression
+          - InvalidResourceFieldValue
+          - InvalidResourceId
+          - InvalidResourceRecordData
+          - InvalidResourceType
+          - InvalidRetentionRestrictions
+          - InvalidServerPatchFile
+          - InvalidSplitPointAddress
+          - InvalidStartEndDates
+          - InvalidStringCharacters
+          - InvalidStringFieldPrefix
+          - InvalidTrustRelationshipCredentials
+          - InvalidTopLevelMerge
+          - InvalidTtlValue
+          - InvalidUdfDateValue
+          - InvalidUdfDefaultValue
+          - InvalidUdfEmailValue
+          - InvalidUdfNumberValue
+          - InvalidUdfPredefinedValue
+          - InvalidUdfPredefinedValues
+          - InvalidUdfUrlValue
+          - InvalidUdfValidationProperties
+          - InvalidUdfValue
+          - InvalidUidValue
+          - InvalidUndoTransactionId
+          - InvalidUrlScheme
+          - InvalidUrlValue
+          - InvalidX509CertificateValue
+          - InvalidZoneName
+          - IpRangeBroadcastOrNetworkIdAssigned
+          - IpRangeDoesNotOverlap
+          - IpRangeExcludesAssignedAddresses
+          - IpRangeExcludesChildRanges
+          - IpRangeExcludesDhcpRanges
+          - IpRangeExcludesGateway
+          - IpRangeIncludesGateway
+          - IpRangeNotAlignedOnRangeBoundary
+          - IpRangeOutsideNetworkBlockBoundary
+          - IpRangeOutsideParent
+          - IpRangeOverlapsSiblings
+          - IpRangeOverlapsRangeInOtherConfiguration
+          - IpRangePartiallyIncludesChildRanges
+          - IpRangeTooBig
+          - IpRangeTooSmall
+          - JsonDeserializationError
+          - JsonParseError
+          - JsonFieldParseError
+          - MacAddressInUse
+          - MismatchedLocationCodeParent
+          - MismatchedManagementAndServicesInterfaces
+          - MismatchedMergeTypes
+          - MissingMandatoryChangeControlComment
+          - MissingMergeDestinationInSiblings
+          - MissingPatchableField
+          - MissingQueryParameter
+          - MissingRequiredDeploymentRoleInterface
+          - MissingRequiredField
+          - MissingRequiredFilterField
+          - MissingRequiredFilterPredicate
+          - MoveAddressUnsupportedState
+          - MoveRolesWithOptionsOnServer
+          - MultipleBgpNeighborsNotSupported
+          - MultipleQueryParameterValues
+          - MultipleValuesNotAllowed
+          - NamingPolicyViolation
+          - NamingPolicyRestrictionViolation
+          - NetworkInterfaceNotConfigured
+          - NothingToDeployForUser
+          - NoAssignedDeploymentRoles
+          - NoHsmConfiguration
+          - NoKeyDistributionCentersInRealm
+          - NoPreviousFullDeploymentForDifferential
+          - NoSpaceForAddress
+          - NoSpaceForBlock
+          - NoSpaceForNetwork
+          - NoSpaceForRange
+          - OrderByParseError
+          - OrderByTokenError
+          - PaginationNotSupported
+          - PassiveServerConfigurationError
+          - PassiveServerMissingHaBackbone
+          - PasswordFailedRequirements
+          - RedirectPolicyTypeDisabled
+          - ReplicatedServerLimitReached
+          - ReplicationOperationNotAllowed
+          - ResetServerServicesRequired
+          - ResourceFieldNotInConfiguration
+          - ResourceFieldNotInRestrictedZones
+          - ResourceHasCircularReference
+          - ResourceHasRecordsNotInZone
+          - ResourceNotInConfiguration
+          - ResourceNotInRestrictedZones
+          - ResourceNotInTemplate
+          - ResourceNotInView
+          - ServerCommandError
+          - ServerControlResetRequired
+          - ServerGroupNotMultiPrimary
+          - ServerGroupSizeLimitReached
+          - ServerHasAssignedDeploymentOptions
+          - ServerHasAssignedDeploymentRoles
+          - ServerIsDeploying
+          - ServerIsMultiPrimaryServerGroupMember
+          - ServerIsPassive
+          - ServerManagementAddressProtocolMismatch
+          - ServerNotActive
+          - ServerNotDisabled
+          - ServerNotManaged
+          - ServerNotStandaloneServer
+          - ServerNotTrusted
+          - ServerServiceInterfaceNameMismatch
+          - ServerSslHandshakeError
+          - SigningPolicyInUse
+          - SsoEnforcementRequirementsUnmet
+          - StringFieldTooBig
+          - StringFieldTooSmall
+          - TemplateApplicationFailedToStart
+          - TemplateNotAssigned
+          - TotalCountNotSupported
+          - TrustRelationshipLimitReached
+          - UdfPredefinedValueInUse
+          - UdfValidationPropertiesInUse
+          - UdfValueExceedsMaximumLength
+          - UdfValueLessThanMinimum
+          - UdfValueLessThanMinimumLength
+          - UdfValueOutsideRange
+          - UnsupportedAggregateOperator
+          - UnsupportedAggregateFilterOperator
+          - UnsupportedDeploymentOptionScope
+          - UnsupportedDeploymentRoleInterfaceType
+          - UnsupportedEmbeddableCollection
+          - UnsupportedEmbeddableResource
+          - UnsupportedFieldsOperatorForMediaType
+          - UnsupportedFilterOperator
+          - UnsupportedFilterOperatorForNullValue
+          - UnsupportedHeaderEncoding
+          - UnsupportedHeaderValue
+          - UnsupportedImportFileType
+          - UnsupportedMultiPrimaryDeploymentOption
+          - UnsupportedOrderByField
+          - UnsupportedOrderByOperator
+          - UnsupportedResourceFieldValue
+          - UnsupportedResourceType
+          - UnsupportedServerCommand
+          - ValueLessThanMinimum
+          - ValueOutsideRange
+          - WorkflowRequestNotPending
+          - WrongCsvRowFieldCount
+          - WrongResourceType
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    IPv4BlockImportPostRequestBody:
+      required:
+      - type
+      allOf:
+      - $ref: '#/components/schemas/IPv4BlockImport'
+    IPv4BlockImportCollectionHalLinks:
+      type: object
+      properties:
+        next:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/imports?offset=2000&limit=1000
+          nullable: false
+          readOnly: true
+        prev:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/imports?offset=0&limit=1000
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    IPv4NetworkImport:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The type of import
+          enum:
+          - IPv4NetworkImport
+        contentType:
+          type: string
+          description: The content type of the import data
+          readOnly: true
+          example: application/vnd.bcn.proteus-migration+xml; v=3.0
+        size:
+          type: integer
+          description: The size of the import, in bytes
+          format: int64
+          readOnly: true
+          example: 10193
+        state:
+          type: string
+          description: The current state of the import
+          enum:
+          - PENDING
+          - QUEUED
+          - RUNNING
+          - CANCELLED
+          - CANCELLING
+          - COMPLETED
+          - COMPLETED_WITH_ERRORS
+          - COMPLETED_WITH_WARNINGS
+          - FAILED
+          - UNKNOWN
+        creationDateTime:
+          type: string
+          description: The date and time the import resource was created
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:34:22Z'
+        startDateTime:
+          type: string
+          description: The date and time the import was started
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:38:23Z'
+        completionDateTime:
+          type: string
+          description: The date and time the import completed
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:47:43Z'
+        resources:
+          type: array
+          description: A list of imported resources.
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/IPv4Network'
+    IPv6NetworkImport:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The type of import
+          enum:
+          - IPv6NetworkImport
+        contentType:
+          type: string
+          description: The content type of the import data
+          readOnly: true
+          example: application/vnd.bcn.proteus-migration+xml; v=3.0
+        size:
+          type: integer
+          description: The size of the import, in bytes
+          format: int64
+          readOnly: true
+          example: 10193
+        state:
+          type: string
+          description: The current state of the import
+          enum:
+          - PENDING
+          - QUEUED
+          - RUNNING
+          - CANCELLED
+          - CANCELLING
+          - COMPLETED
+          - COMPLETED_WITH_ERRORS
+          - COMPLETED_WITH_WARNINGS
+          - FAILED
+          - UNKNOWN
+        creationDateTime:
+          type: string
+          description: The date and time the import resource was created
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:34:22Z'
+        startDateTime:
+          type: string
+          description: The date and time the import was started
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:38:23Z'
+        completionDateTime:
+          type: string
+          description: The date and time the import completed
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:47:43Z'
+        resources:
+          type: array
+          description: A list of imported resources.
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/IPv6Network'
+    IPv4BlockImport:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The type of import
+          enum:
+          - IPv4BlockImport
+        contentType:
+          type: string
+          description: The content type of the import data
+          readOnly: true
+          example: application/vnd.bcn.proteus-migration+xml; v=3.0
+        size:
+          type: integer
+          description: The size of the import, in bytes
+          format: int64
+          readOnly: true
+          example: 10193
+        state:
+          type: string
+          description: The current state of the import
+          enum:
+          - PENDING
+          - QUEUED
+          - RUNNING
+          - CANCELLED
+          - CANCELLING
+          - COMPLETED
+          - COMPLETED_WITH_ERRORS
+          - COMPLETED_WITH_WARNINGS
+          - FAILED
+          - UNKNOWN
+        creationDateTime:
+          type: string
+          description: The date and time the import resource was created
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:34:22Z'
+        startDateTime:
+          type: string
+          description: The date and time the import was started
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:38:23Z'
+        completionDateTime:
+          type: string
+          description: The date and time the import completed
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:47:43Z'
+        resources:
+          type: array
+          description: A list of imported resources.
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/IPv4Block'
+    IPv4NetworkImportPostRequestBody:
+      required:
+      - type
+      allOf:
+      - $ref: '#/components/schemas/IPv4NetworkImport'
+    IPv6NetworkImportPostRequestBody:
+      required:
+      - type
+      allOf:
+      - $ref: '#/components/schemas/IPv6NetworkImport'
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 403
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Forbidden
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - AccessDenied
+          - CreateNotAllowed
+          - DeleteLastLinkNotAllowed
+          - DeleteLastStandbyServerNotAllowed
+          - DeleteNotAllowed
+          - DisableHaServerServiceNotSupported
+          - EnableHaServerServiceNotSupported
+          - FieldUpdateNotAllowed
+          - FileSizeTooBig
+          - InvalidAuthorizationScheme
+          - OperationNotPermitted
+          - ReadOnlySession
+          - ReadOnlySessionOnPrimary
+          - ResourceInUse
+          - ServerIsF5PoolMember
+          - ServerInReplication
+          - UpdateNotAllowed
+          - WorkflowRequestApproveDenyNotAllowed
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    IPv6BlockImport:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The type of import
+          enum:
+          - IPv6BlockImport
+        contentType:
+          type: string
+          description: The content type of the import data
+          readOnly: true
+          example: application/vnd.bcn.proteus-migration+xml; v=3.0
+        size:
+          type: integer
+          description: The size of the import, in bytes
+          format: int64
+          readOnly: true
+          example: 10193
+        state:
+          type: string
+          description: The current state of the import
+          enum:
+          - PENDING
+          - QUEUED
+          - RUNNING
+          - CANCELLED
+          - CANCELLING
+          - COMPLETED
+          - COMPLETED_WITH_ERRORS
+          - COMPLETED_WITH_WARNINGS
+          - FAILED
+          - UNKNOWN
+        creationDateTime:
+          type: string
+          description: The date and time the import resource was created
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:34:22Z'
+        startDateTime:
+          type: string
+          description: The date and time the import was started
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:38:23Z'
+        completionDateTime:
+          type: string
+          description: The date and time the import completed
+          format: date-time
+          readOnly: true
+          example: '2022-11-07T10:47:43Z'
+        resources:
+          type: array
+          description: A list of imported resources.
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/IPv6Block'
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 401
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Unauthorized
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - InvalidAuthorizationCredentials
+          - InvalidServerPassword
+          - InvalidUsernameOrApiKey
+          - InvalidUsernameOrPassword
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 404
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Not Found
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerNotConnected
+          - CannotConnectToServer
+          - InlinedResourceNotFound
+          - NetworkNotFoundForAddress
+          - PassiveServerNotConnected
+          - ResourceNotFound
+          - ResourceFieldNotFound
+          - ServerGroupHasNoMembers
+          - ServerNotConnected
+          - ServerServiceInterfaceNotConnected
+          - WrongResourceCollection
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    IPv6BlockImportPostRequestBody:
+      required:
+      - type
+      allOf:
+      - $ref: '#/components/schemas/IPv6BlockImport'
+    CollectionTotalCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    IPv4Network:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Prefix'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            enum:
+            - IPv4Network
+          range:
+            type: string
+            description: The address range for the IPv4 network.
+            nullable: false
+          location:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedLocation'
+          gateway:
+            type: string
+            description: The gateway address for the IPv4 network.
+          template:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedIPv4Template'
+          routerPortInfo:
+            type: string
+            description: Connected router port information for the IPv4 network.
+            readOnly: true
+          defaultView:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedView'
+          sharedNetworkTag:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedTag'
+          duplicateHostnamesAllowed:
+            type: boolean
+            description: Indicates whether duplicate hostnames are allowed in the
+              network. If enabled, duplicate hostnames will be allowed. If not set
+              explicitly, this value will be inherited from the parent block.
+          pingBeforeAssignmentEnabled:
+            type: boolean
+            description: Indicates whether Address Manager will ping IP addresses
+              before assigning them. Unavailable addresses will not be assigned.
+          defaultZonesInherited:
+            type: boolean
+            description: Indicates whether the IPv4 network will inherit the parent
+              resource's default domains if configured.
+            nullable: false
+          defaultZones:
+            type: array
+            description: The default DNS zone associated with the IPv4 network.
+            writeOnly: true
+            items:
+              required:
+              - id
+              allOf:
+              - $ref: '#/components/schemas/InlinedZone'
+          restrictedZonesInherited:
+            type: boolean
+            description: Indicates whether the IPv4 network will inherit the parent
+              resource's restricted views and zones if configured.
+            nullable: false
+          restrictedZones:
+            type: array
+            description: The DNS views and zones restricted to this IPv4 network.
+            writeOnly: true
+            items:
+              $ref: '#/components/schemas/ConfigurationChild'
+          lowWaterMark:
+            maximum: 100
+            minimum: 0
+            type: integer
+            description: A DHCP alert is triggered when usage falls below this percentage
+              (when too few addresses are in use).
+            format: int32
+            example: 15
+          highWaterMark:
+            maximum: 100
+            minimum: 0
+            type: integer
+            description: A DHCP alert is triggered when usage exceeds this percentage
+              (when too many addresses are in use).
+            format: int32
+            example: 95
+          dynamicUpdateEnabled:
+            type: boolean
+            description: Indicates whether the dynamic update of DHCP reserved IPv4
+              addresses is enabled.
+            nullable: false
+          reverseZoneSigned:
+            type: boolean
+            description: Indicates whether the reverse zone associated with the IPv4
+              network will be signed according to the DNSSEC signing policy in reverseZoneSigningPolicy.
+            nullable: false
+          reverseZoneSigningPolicy:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedDNSSECSigningPolicy'
+          usage:
+            type: object
+            additionalProperties:
+              type: integer
+              description: Values indicating the current amount of static, DHCP allocated,
+                DHCP abandoned, DHCP reserved, reserved, gateway, and unassigned IP
+                addresses within the network.
+              format: int64
+            description: Values indicating the current amount of static, DHCP allocated,
+              DHCP abandoned, DHCP reserved, reserved, gateway, and unassigned IP
+              addresses within the network.
+            readOnly: true
+            writeOnly: true
+          _inheritedFields:
+            type: array
+            description: The fields inherited from the parent resource.
+            readOnly: true
+            items:
+              type: string
+              description: The fields inherited from the parent resource.
+    IPv6Network:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Prefix'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            enum:
+            - IPv6Network
+          range:
+            type: string
+            description: The address range for the IPv6 network.
+            nullable: false
+          location:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedLocation'
+          _inheritedFields:
+            type: array
+            description: The fields inherited from the parent resource.
+            readOnly: true
+            items:
+              type: string
+              description: The fields inherited from the parent resource.
+    IPv4Block:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Prefix'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of IP block.
+            enum:
+            - IPv4Block
+          range:
+            type: string
+            description: The address range for the IPv4 block.
+            nullable: false
+          location:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedLocation'
+          template:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedIPv4Template'
+          defaultView:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedView'
+          duplicateHostnamesAllowed:
+            type: boolean
+            description: Indicates whether duplicate hostnames are allowed in the
+              block. If enabled, duplicate hostnames will be allowed. If not set explicitly,
+              this value will be inherited from the parent block.
+          pingBeforeAssignmentEnabled:
+            type: boolean
+            description: If set to true, Address Manager will ping IP addresses before
+              assigning them. If set to false, Address Manager will assign addresses
+              without checking their availability.
+          defaultZonesInherited:
+            type: boolean
+            description: If set to true, the IPv4 block will inherit the parent resource's
+              default domains configuration if possible.
+            nullable: false
+          defaultZones:
+            type: array
+            description: The default DNS zone associated with the IPv4 block.
+            writeOnly: true
+            items:
+              required:
+              - id
+              allOf:
+              - $ref: '#/components/schemas/InlinedZone'
+          restrictedZonesInherited:
+            type: boolean
+            description: If set to true, the IPv4 block will inherit the parent resource's
+              DNS restriction configuration if possible.
+            nullable: false
+          restrictedZones:
+            type: array
+            description: The DNS views and zones restricted to this IPv4 block.
+            writeOnly: true
+            items:
+              $ref: '#/components/schemas/ConfigurationChild'
+          lowWaterMark:
+            minimum: 0
+            type: integer
+            description: A DHCP alert is triggered when usage falls below this percentage
+              (when too few addresses are in use).
+            format: int32
+            example: 15
+          highWaterMark:
+            minimum: 0
+            type: integer
+            description: A DHCP alert is triggered when usage exceeds this percentage
+              (when too many addresses are in use).
+            format: int32
+            example: 95
+          reverseZoneSigned:
+            type: boolean
+            description: If set to true, the reverse zone associated with the IPv4
+              block will be signed according to the DNSSEC signing policy in reverseZoneSigningPolicy.
+            nullable: false
+          reverseZoneSigningPolicy:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedDNSSECSigningPolicy'
+          usagePercentage:
+            readOnly: true
+            allOf:
+            - $ref: '#/components/schemas/BlockUsageBean'
+          _inheritedFields:
+            type: array
+            description: The fields inherited from the parent resource.
+            readOnly: true
+            items:
+              type: string
+              description: The fields inherited from the parent resource.
+    IPv6Block:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Prefix'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The type of IP block.
+            enum:
+            - IPv6Block
+          range:
+            type: string
+            description: The address range for the IPv6 block.
+            nullable: false
+          location:
+            required:
+            - id
+            allOf:
+            - $ref: '#/components/schemas/InlinedLocation'
+          _inheritedFields:
+            type: array
+            description: The fields inherited from the parent resource.
+            readOnly: true
+            items:
+              type: string
+              description: The fields inherited from the parent resource.
+    ConfigurationChild:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+        name:
+          type: string
+          description: The name of the resource.
+          example: name
+        userDefinedFields:
+          type: object
+          additionalProperties:
+            type: object
+          description: User-defined fields set for the resource.
+          example:
+            udf1: value1
+            udf2: value2
+        configuration:
+          required:
+          - id
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/InlinedConfiguration'
+      description: The DNS views and zones restricted to this IPv4 block.
+    InlinedIPv4Template:
+      title: IPv4Template
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - IPv4Template
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+    Prefix:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+        name:
+          type: string
+          description: The name of the resource.
+          example: name
+        userDefinedFields:
+          type: object
+          additionalProperties:
+            type: object
+          description: User-defined fields set for the resource.
+          example:
+            udf1: value1
+            udf2: value2
+        configuration:
+          required:
+          - id
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/InlinedConfiguration'
+        range:
+          type: string
+          description: The address range for the IP block or network.
+      description: The list of IPv4 blocks and networks of which resources within
+        this zone are restricted to.
+      discriminator:
+        propertyName: type
+    InlinedTag:
+      title: Tag
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - Tag
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the tag.
+          nullable: false
+          example: UK Office
+    InlinedDNSSECSigningPolicy:
+      title: DNSSECSigningPolicy
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - DNSSECSigningPolicy
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+    InlinedView:
+      title: View
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - View
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the view.
+          nullable: false
+          example: default
+    InlinedLocation:
+      title: Location
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - Location
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+    InlinedZone:
+      title: Zone
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - Zone
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+    BlockUsageBean:
+      type: object
+      properties:
+        addressAllocation:
+          $ref: '#/components/schemas/BlockUsageAllocationBean'
+        networkAllocation:
+          $ref: '#/components/schemas/BlockUsageAllocationBean'
+      description: Percentage values indicating the current amount of allocated and
+        unallocated IPv4 addresses within the block.
+    InlinedConfiguration:
+      title: Configuration
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          enum:
+          - Configuration
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the resource.
+          nullable: false
+          example: name
+    BlockUsageAllocationBean:
+      type: object
+      properties:
+        assigned:
+          type: integer
+          description: The percentage of assigned space within the block.
+          format: int32
+        unassigned:
+          type: integer
+          description: The percentage of unassigned space within the block.
+          format: int32
+      description: The percentage of the used and available block space based on the
+        network sizes within the block.
+  headers:
+    Location:
+      description: The location of the resource
+      required: true
+      schema:
+        type: string
+  examples:
+    importResourceExampleNetworkResourceImport:
+      summary: Create an IPv4 network import
+      description: Import a list of IPv4 networks to a block.
+      value: 'type,name,range
+
+        IPv4Network,network1,10.0.1.0/24
+
+        IPv4Network,network2,10.0.2.0/24'

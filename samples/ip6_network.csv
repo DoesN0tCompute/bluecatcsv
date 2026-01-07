@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,parent,*cidr,name,description,location_code
+1,ip6_network,create,Default,2001:db8::/32,2001:db8:1::/64,IPv6-Production-Network,Primary production IPv6 network,
+2,ip6_network,create,Default,2001:db8::/32,2001:db8:2::/64,IPv6-Development-Network,Development IPv6 network,
+

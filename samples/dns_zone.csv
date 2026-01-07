@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,*view_path,*zone_name,description
+1,dns_zone,create,Default,Internal,example.local,Internal corporate domain
+2,dns_zone,create,Default,Internal,corp.example.local,Corporate services subdomain
+3,dns_zone,create,Default,Internal,dev.example.local,Development environment subdomain

@@ -1,0 +1,8 @@
+*row_id,*object_type,*action,name,tag_group
+1,tag,create,Production,Environment
+2,tag,create,Development,Environment
+3,tag,create,Staging,Environment
+4,tag,create,IT-Team,Owner
+5,tag,create,Network-Ops,Owner
+6,tag,create,PCI-DSS,Compliance
+7,tag,create,HIPAA,Compliance

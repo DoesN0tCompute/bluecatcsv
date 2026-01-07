@@ -1,0 +1,98 @@
+# BlueCat CSV Importer Configuration Example
+# Copy this file to config.yaml and update with your credentials
+#
+# Alternatively, use environment variables:
+#   BAM_URL, BAM_USERNAME, BAM_PASSWORD, BAM_VERIFY_SSL
+
+# =============================================================================
+# BAM Connection Settings
+# =============================================================================
+bam:
+  base_url: "https://your-bam-server.example.com"
+  username: "your-username"
+  password: "your-password"
+  verify_ssl: true
+  api_version: "v2"
+  timeout: 30              # Request timeout in seconds
+  max_connections: 50      # Maximum total connections
+  max_keepalive: 20        # Maximum keep-alive connections
+
+# =============================================================================
+# Policy Settings
+# =============================================================================
+policy:
+  # Conflict resolution
+  allow_overwrite: true
+  conflict_resolution: "merge"  # Options: fail, overwrite, merge, manual
+
+  # Execution policies
+  failure_policy: "fail_group"  # Options: fail_fast, fail_group, continue
+  safe_mode: true               # Prevent destructive operations by default
+  update_mode: "upsert"         # Options: create_only, upsert, update_only
+  max_concurrent_operations: 10
+
+  # Auto-creation policies
+  auto_create_network: false
+  auto_create_zone: false
+  auto_create_view: false
+
+  # DNS policies
+  create_dns: false
+  create_reverse_record: false
+  override_naming_policy: false
+
+  # Performance settings
+  initial_concurrency: 10
+  min_concurrency: 1
+  max_concurrency: 50
+  enable_adaptive_throttle: true
+
+  # Observability
+  enable_metrics: false
+  metrics_backend: "prometheus"  # Options: prometheus
+
+  # Orphan detection (advanced)
+  enable_orphan_detection: false
+  orphan_action: "report"  # Options: report, delete, ignore
+
+# =============================================================================
+# Logging Settings
+# =============================================================================
+logging:
+  level: "INFO"      # Options: DEBUG, INFO, WARNING, ERROR
+  format: "json"     # Options: json, console
+  # file: "/var/log/bluecat-import/importer.log"  # Optional log file path
+
+# =============================================================================
+# Circuit Breaker Settings (API Resilience)
+# =============================================================================
+circuit_breaker:
+  failure_threshold: 15      # Failures before opening circuit
+  recovery_timeout: 30       # Seconds to wait before testing recovery
+  auth_failure_threshold: 5  # Auth-specific circuit breaker threshold
+  auth_circuit_timeout: 60   # Auth circuit recovery time in seconds
+
+# =============================================================================
+# Cache Settings
+# =============================================================================
+cache:
+  enabled: true
+  ttl_seconds: 3600           # Cache TTL (1 hour)
+  directory: ".resolver_cache"
+  view_cache_ttl: 300         # In-memory view cache TTL (5 minutes)
+
+# =============================================================================
+# Throttle Settings (Adaptive Concurrency)
+# =============================================================================
+throttle:
+  initial_concurrency: 10
+  min_concurrency: 1
+  max_concurrency: 50
+  increase_factor: 1.2        # 20% increase on success
+  decrease_factor: 0.8        # 20% decrease on failure
+  rate_limit_decrease: 0.5    # 50% decrease on rate limit
+  adjustment_interval: 10.0   # Seconds between adjustments
+  healthy_error_rate: 0.01    # < 1% errors
+  unhealthy_error_rate: 0.05  # > 5% errors
+  high_latency_ms: 1000.0     # > 1 second
+  max_latency_samples: 100    # Maximum latency samples to track

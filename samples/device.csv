@@ -1,0 +1,5 @@
+*row_id,*object_type,*action,*config,name,device_type,device_subtype,addresses,mac_address
+1,device,create,Default,firewall-primary,Fortinet,FortiGate-600E,,00:11:22:33:44:55
+2,device,create,Default,firewall-backup,Fortinet,FortiGate-600E,,00:11:22:33:44:56
+3,device,create,Default,core-switch-01,Custom-Switch,48-Port-PoE,,
+4,device,create,Default,router-edge,Cisco,ASA-5505,,

@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,name,display_name,source_types,destination_types
+1,udl_definition,create,AssociatedDevice,Associated Device,IPv4Address,Device
+2,udl_definition,create,BackupServer,Backup Server,IPv4Network,Server
+3,udl_definition,create,RelatedHost,Related Host Record,IPv4Address,Device

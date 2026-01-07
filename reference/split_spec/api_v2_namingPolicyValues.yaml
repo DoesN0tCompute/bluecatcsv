@@ -1,0 +1,1162 @@
+openapi: 3.0.1
+info:
+  title: BlueCat Address Manager RESTful v2 API
+  description: 'The **BlueCat Address Manager RESTful v2 API** is a new RESTful API
+    for Address Manager that presents Address Manager objects as resources. Each resource
+    has a unique endpoint, and related resources are grouped in collections. To fetch
+    an individual resource, a `GET` request is sent to the resource''s endpoint. To
+    fetch all resources in a collection, a `GET` request is sent to the collection''s
+    endpoint.
+
+
+    The RESTful v2 API is [hypermedia driven](https://en.wikipedia.org/wiki/HATEOAS)
+    and uses the [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language)
+    format for representing links. When navigating through the API, you can use those
+    links to navigate to related resources or child resources of the requested endpoint.
+    The API supports the following media types for most endpoints:  `application/hal+json`,
+    `application/json`, and `text/csv`.  For authentication, the API supports both
+    `Basic` and `Bearer` HTTP authentication schemes.
+
+
+    To get started, create a session and receive credentials for `Basic` authentication
+    by sending a `POST` request to the [/sessions](#/User%20and%20Group%20Resources/postSession)
+    endpoint, with a message body containing the user''s credentials:
+
+
+    ```{"username":"apiuser", "password":"apipass"}```
+
+
+    The response will contain an `apiToken` field that can be entered with the username
+    in the Swagger UI **Authorize** dialog. The response will also contain a `basicAuthenticationCredentials`
+    field containing a base64 encoding of the requester''s username and API token
+    delimited by a colon. This string can be injected directly into request `Authorization`
+    headers in the following format:
+
+
+    ```Authorization: Basic YXBpOlQ0OExOT3VIRGhDcnVBNEo1bGFES3JuS3hTZC9QK3pjczZXTzBJMDY=```
+
+
+    For full details on API format and authentication methods, refer to the Address
+    Manager RESTful v2 API Guide on the BlueCat Documentation Portal.'
+  termsOfService: https://docs.bluecatnetworks.com/r/Terms-and-Conditions/Terms-and-Conditions
+  contact:
+    name: BlueCat Customer Care
+    url: https://care.bluecatnetworks.com/
+  license:
+    name: BlueCat License Agreements
+    url: https://bluecatnetworks.com/license-agreements/
+  version: 9.6.0
+paths:
+  /api/v2/namingPolicyValues:
+    get:
+      tags:
+      - View and Zone Resources
+      summary: Retrieve a collection of naming policy values
+      description: Retrieve a collection of all naming policy values.
+      operationId: getNamingPolicyValues
+      parameters:
+      - $ref: '#/components/parameters/fields'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/filter'
+      - $ref: '#/components/parameters/orderBy'
+      - $ref: '#/components/parameters/total'
+      responses:
+        '200':
+          description: The root collection of naming policy values
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                properties:
+                  _links:
+                    $ref: '#/components/schemas/NamingPolicyConnectorValueCollectionHalLinks'
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      allOf:
+                      - oneOf:
+                        - $ref: '#/components/schemas/NamingPolicyConnectorValue'
+                        - $ref: '#/components/schemas/NamingPolicyIncrementalValue'
+                        - $ref: '#/components/schemas/NamingPolicyIntegerValue'
+                        - $ref: '#/components/schemas/NamingPolicyRequiredValue'
+                        - $ref: '#/components/schemas/NamingPolicyTextValue'
+                      - type: object
+                        properties:
+                          _links:
+                            $ref: '#/components/schemas/NamingPolicyConnectorValueResourceLinks'
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      oneOf:
+                      - $ref: '#/components/schemas/NamingPolicyConnectorValue'
+                      - $ref: '#/components/schemas/NamingPolicyIncrementalValue'
+                      - $ref: '#/components/schemas/NamingPolicyIntegerValue'
+                      - $ref: '#/components/schemas/NamingPolicyRequiredValue'
+                      - $ref: '#/components/schemas/NamingPolicyTextValue'
+            text/csv:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    post:
+      tags:
+      - View and Zone Resources
+      summary: Create a new naming policy value
+      description: Create a new naming policy value. A naming policy value is an individual
+        part of a resource record name, such as a specific character, an incremental
+        number, a number or text entered by the user, or a value selected from the
+        predefined list.
+      operationId: postNamingPolicyValue
+      parameters:
+      - $ref: '#/components/parameters/x-bcn-change-control-comment'
+      requestBody:
+        content:
+          application/hal+json:
+            schema:
+              discriminator:
+                propertyName: type
+                mapping:
+                  NamingPolicyConnectorValue: '#/components/schemas/NamingPolicyConnectorValuePostRequestBody'
+                  NamingPolicyIncrementalValue: '#/components/schemas/NamingPolicyIncrementalValuePostRequestBody'
+                  NamingPolicyIntegerValue: '#/components/schemas/NamingPolicyIntegerValuePostRequestBody'
+                  NamingPolicyRequiredValue: '#/components/schemas/NamingPolicyRequiredValuePostRequestBody'
+                  NamingPolicyTextValue: '#/components/schemas/NamingPolicyTextValuePostRequestBody'
+              oneOf:
+              - $ref: '#/components/schemas/NamingPolicyConnectorValuePostRequestBody'
+              - $ref: '#/components/schemas/NamingPolicyIncrementalValuePostRequestBody'
+              - $ref: '#/components/schemas/NamingPolicyIntegerValuePostRequestBody'
+              - $ref: '#/components/schemas/NamingPolicyRequiredValuePostRequestBody'
+              - $ref: '#/components/schemas/NamingPolicyTextValuePostRequestBody'
+            examples:
+              namingPolicyValueExampleConnector:
+                $ref: '#/components/examples/namingPolicyValueExampleConnector'
+              namingPolicyValueExampleIncremental:
+                $ref: '#/components/examples/namingPolicyValueExampleIncremental'
+              namingPolicyValueExampleInteger:
+                $ref: '#/components/examples/namingPolicyValueExampleInteger'
+              namingPolicyValueExampleRequired:
+                $ref: '#/components/examples/namingPolicyValueExampleRequired'
+              namingPolicyValueExampleText:
+                $ref: '#/components/examples/namingPolicyValueExampleText'
+            encoding: {}
+          application/json:
+            schema:
+              discriminator:
+                propertyName: type
+                mapping:
+                  NamingPolicyConnectorValue: '#/components/schemas/NamingPolicyConnectorValuePostRequestBody'
+                  NamingPolicyIncrementalValue: '#/components/schemas/NamingPolicyIncrementalValuePostRequestBody'
+                  NamingPolicyIntegerValue: '#/components/schemas/NamingPolicyIntegerValuePostRequestBody'
+                  NamingPolicyRequiredValue: '#/components/schemas/NamingPolicyRequiredValuePostRequestBody'
+                  NamingPolicyTextValue: '#/components/schemas/NamingPolicyTextValuePostRequestBody'
+              oneOf:
+              - $ref: '#/components/schemas/NamingPolicyConnectorValuePostRequestBody'
+              - $ref: '#/components/schemas/NamingPolicyIncrementalValuePostRequestBody'
+              - $ref: '#/components/schemas/NamingPolicyIntegerValuePostRequestBody'
+              - $ref: '#/components/schemas/NamingPolicyRequiredValuePostRequestBody'
+              - $ref: '#/components/schemas/NamingPolicyTextValuePostRequestBody'
+            examples:
+              namingPolicyValueExampleConnector:
+                $ref: '#/components/examples/namingPolicyValueExampleConnector'
+              namingPolicyValueExampleIncremental:
+                $ref: '#/components/examples/namingPolicyValueExampleIncremental'
+              namingPolicyValueExampleInteger:
+                $ref: '#/components/examples/namingPolicyValueExampleInteger'
+              namingPolicyValueExampleRequired:
+                $ref: '#/components/examples/namingPolicyValueExampleRequired'
+              namingPolicyValueExampleText:
+                $ref: '#/components/examples/namingPolicyValueExampleText'
+            encoding: {}
+      responses:
+        '201':
+          description: The newly created naming policy value
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/hal+json:
+              schema:
+                allOf:
+                - oneOf:
+                  - $ref: '#/components/schemas/NamingPolicyConnectorValue'
+                  - $ref: '#/components/schemas/NamingPolicyIncrementalValue'
+                  - $ref: '#/components/schemas/NamingPolicyIntegerValue'
+                  - $ref: '#/components/schemas/NamingPolicyRequiredValue'
+                  - $ref: '#/components/schemas/NamingPolicyTextValue'
+                - type: object
+                  properties:
+                    _links:
+                      $ref: '#/components/schemas/NamingPolicyConnectorValueResourceLinks'
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/NamingPolicyConnectorValue'
+                - $ref: '#/components/schemas/NamingPolicyIncrementalValue'
+                - $ref: '#/components/schemas/NamingPolicyIntegerValue'
+                - $ref: '#/components/schemas/NamingPolicyRequiredValue'
+                - $ref: '#/components/schemas/NamingPolicyTextValue'
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+security:
+- basicAuthentication: []
+- bearerToken: []
+tags:
+- name: Administrator Resources
+  description: Operations for access rights, configurations, imports, password policies,
+    server patches, services, settings,  user-defined field definitions, user-defined
+    link definitions and workflow requests.
+- name: Authenticator Resources
+  description: Operations for authenticators, Kerberos realms, service principals
+    and key distribution centers.
+- name: Database Management and Replication Resources
+  description: Operations for database replication, database backups and trust relationships.
+- name: Deployment Option Resources
+  description: Operations for deployment options, deployment option definitions, access
+    control lists and match elements.
+- name: Deployment Role Resources
+  description: Operations for deployment roles.
+- name: Device Resources
+  description: Operations for devices, device types and subtypes.
+- name: DHCP Resources
+  description: Operations for DHCP client classes and subclasses, DHCP zone groups
+    and zone declarations, DHCP deployment option definitions and  DHCP vendor profiles.
+- name: DNSSEC Resources
+  description: Operations for DNSSEC signing policies and key management, and TSIG
+    zone signing keys.
+- name: IPv4 and IPv6 Resources
+  description: Operations for addresses, blocks, IP groups, leases, networks, DHCP
+    ranges, IP reconciliation policies and discovered devices, and IP templates.
+- name: Location Resources
+  description: Operations for locations and annotated resources
+- name: MAC Address and Client Identifier Resources
+  description: Operations for DHCP client identifiers, DHCP unique identifiers, MAC
+    addresses and MAC address pools.
+- name: Monitoring Resources
+  description: Operations for events, logs, notification groups, reports and report
+    schedules, transactions, and user sessions.
+- name: Resource Record Resources
+  description: Operations for resource records.
+- name: Server Resources
+  description: Operations for deployments and deployment schedules, interfaces, servers,
+    server groups, server services.
+- name: Tag Resources
+  description: Operations for tags, tag groups, and tagged resources.
+- name: TFTP Resources
+  description: Operations for TFTP groups and files.
+- name: User and Group Resources
+  description: Operations for users and groups, favorites and tasks.
+- name: View and Zone Resources
+  description: Operations for resource record naming policies, DNS response policies,
+    zones and zone templates, and views.
+components:
+  schemas:
+    CollectionCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    ConflictError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 409
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Conflict
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - DeploymentAlreadyQueued
+          - IpAddressConflictsWithSplitNetwork
+          - IpGroupConflictsWithSplitNetwork
+          - IpRangeConflictsWithSplitNetwork
+          - ResourceAlreadyExists
+          - ResourceConflictsWithOther
+          - StaleResourceState
+          - WorkflowRequestAlreadyPending
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 400
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Bad Request
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerConfigurationError
+          - ActiveServerMissingHaBackbone
+          - AddressHasLinkedRecords
+          - AddressIsBroadcastAddress
+          - AddressIsNetworkId
+          - AddressIsNetworkRouterAnycast
+          - AddressIsReserved
+          - AddressNotInNetwork
+          - AddressNotInRestrictedRanges
+          - AddressProtocolMatch
+          - AddressProtocolMismatch
+          - ArrayFieldSizeTooBig
+          - ArrayFieldSizeTooSmall
+          - AuthenticatorMismatch
+          - BlankFieldValue
+          - BrokenMandatoryDependency
+          - BrokenOptionalDependency
+          - CannotAssociateServerAssignedOption
+          - CannotEnableSso
+          - CannotFailoverWhileNodesDisconnected
+          - CannotFetchGroupsFromLdapAuthenticator
+          - ConflictingFieldsList
+          - ConflictingOrderBySortDirections
+          - ConflictingResourceFieldValues
+          - CreateUpdateNetworkGatewayNotSupported
+          - DatabaseNotInReplicatedState
+          - DatabaseReplicationInProgress
+          - DedicatedManagementNotEnabled
+          - DeleteAuthenticatorNotAllowed
+          - DeploymentFailedToStart
+          - DhcpDeploymentValidationNotEnabled
+          - DnsDeploymentValidationNotEnabled
+          - DuplicateFieldValue
+          - DuplicateFilterField
+          - DuplicateOrderByField
+          - DuplicateOrderByOperator
+          - DurationValueNotDivisibleBy
+          - DurationValueOutsideRange
+          - EmptyFieldValue
+          - EmptyRequestBody
+          - FailoverTargetAlreadyPrimaryServer
+          - FieldsParseError
+          - FieldsTokenError
+          - FieldHasPatchOnlyUpdate
+          - FieldNotPatchable
+          - FieldValueTooSmall
+          - FilterNeedsRefinement
+          - FilterParseError
+          - FilterTokenError
+          - ImportInProgress
+          - IncompatibleServerProfile
+          - IncompatibleServerVersion
+          - InterfaceRedundancyConfigurationError
+          - InvalidAnycastAddress
+          - InvalidAsciiString
+          - InvalidCsv
+          - InvalidDateValue
+          - InvalidDnsFeedLicense
+          - InvalidDuidValue
+          - InvalidDurationValue
+          - InvalidEmailAddress
+          - InvalidBase64Value
+          - InvalidEnumValue
+          - InvalidEnumZoneAbsoluteNameLength
+          - InvalidEnumZoneName
+          - InvalidFieldName
+          - InvalidFieldPath
+          - InvalidFileCharacterEncoding
+          - InvalidFileContentDisposition
+          - InvalidFileDataValue
+          - InvalidFilterAddress
+          - InvalidFilterAddressRange
+          - InvalidFilterAddressRangeSize
+          - InvalidFilterCountsAndPercentages
+          - InvalidFilterDate
+          - InvalidFilterEnumValue
+          - InvalidFilterField
+          - InvalidFilterMacAddress
+          - InvalidFilterPartialAddress
+          - InvalidFilterPercentage
+          - InvalidFilterValue
+          - InvalidFilterValueType
+          - InvalidFullyQualifiedDomainName
+          - InvalidFullyQualifiedDomainNameField
+          - InvalidGatewayMountPointValue
+          - InvalidHeaderValue
+          - InvalidInlinedResource
+          - InvalidIpv4AddressValue
+          - InvalidIpv4LoopbackPrefixLength
+          - InvalidIpv4RangeValue
+          - InvalidIpv6AddressValue
+          - InvalidIpv6BlockPrefixLength
+          - InvalidIpv6LoopbackPrefixLength
+          - InvalidIpv6NetworkPrefixLength
+          - InvalidIpv6RangeValue
+          - InvalidIpAddressState
+          - InvalidIpAddressValue
+          - InvalidIpAddressOrFullyQualifiedDomainNameValue
+          - InvalidIpBlockValue
+          - InvalidIpRangeValue
+          - InvalidLdapGroupName
+          - InvalidLimitParameterValue
+          - InvalidLocationCode
+          - InvalidMacAddressValue
+          - InvalidMatchCriteria
+          - InvalidMoveDestination
+          - InvalidNumberZoneAbsoluteNameLength
+          - InvalidNtpServerAddressForStratum
+          - InvalidOffsetParameterValue
+          - InvalidPaginationParameter
+          - InvalidPartialMacAddressFilter
+          - InvalidPolicyItemNameValue
+          - InvalidPrivateKeyValue
+          - InvalidQueryParameterValue
+          - InvalidRegularExpression
+          - InvalidResourceFieldValue
+          - InvalidResourceId
+          - InvalidResourceRecordData
+          - InvalidResourceType
+          - InvalidRetentionRestrictions
+          - InvalidServerPatchFile
+          - InvalidSplitPointAddress
+          - InvalidStartEndDates
+          - InvalidStringCharacters
+          - InvalidStringFieldPrefix
+          - InvalidTrustRelationshipCredentials
+          - InvalidTopLevelMerge
+          - InvalidTtlValue
+          - InvalidUdfDateValue
+          - InvalidUdfDefaultValue
+          - InvalidUdfEmailValue
+          - InvalidUdfNumberValue
+          - InvalidUdfPredefinedValue
+          - InvalidUdfPredefinedValues
+          - InvalidUdfUrlValue
+          - InvalidUdfValidationProperties
+          - InvalidUdfValue
+          - InvalidUidValue
+          - InvalidUndoTransactionId
+          - InvalidUrlScheme
+          - InvalidUrlValue
+          - InvalidX509CertificateValue
+          - InvalidZoneName
+          - IpRangeBroadcastOrNetworkIdAssigned
+          - IpRangeDoesNotOverlap
+          - IpRangeExcludesAssignedAddresses
+          - IpRangeExcludesChildRanges
+          - IpRangeExcludesDhcpRanges
+          - IpRangeExcludesGateway
+          - IpRangeIncludesGateway
+          - IpRangeNotAlignedOnRangeBoundary
+          - IpRangeOutsideNetworkBlockBoundary
+          - IpRangeOutsideParent
+          - IpRangeOverlapsSiblings
+          - IpRangeOverlapsRangeInOtherConfiguration
+          - IpRangePartiallyIncludesChildRanges
+          - IpRangeTooBig
+          - IpRangeTooSmall
+          - JsonDeserializationError
+          - JsonParseError
+          - JsonFieldParseError
+          - MacAddressInUse
+          - MismatchedLocationCodeParent
+          - MismatchedManagementAndServicesInterfaces
+          - MismatchedMergeTypes
+          - MissingMandatoryChangeControlComment
+          - MissingMergeDestinationInSiblings
+          - MissingPatchableField
+          - MissingQueryParameter
+          - MissingRequiredDeploymentRoleInterface
+          - MissingRequiredField
+          - MissingRequiredFilterField
+          - MissingRequiredFilterPredicate
+          - MoveAddressUnsupportedState
+          - MoveRolesWithOptionsOnServer
+          - MultipleBgpNeighborsNotSupported
+          - MultipleQueryParameterValues
+          - MultipleValuesNotAllowed
+          - NamingPolicyViolation
+          - NamingPolicyRestrictionViolation
+          - NetworkInterfaceNotConfigured
+          - NothingToDeployForUser
+          - NoAssignedDeploymentRoles
+          - NoHsmConfiguration
+          - NoKeyDistributionCentersInRealm
+          - NoPreviousFullDeploymentForDifferential
+          - NoSpaceForAddress
+          - NoSpaceForBlock
+          - NoSpaceForNetwork
+          - NoSpaceForRange
+          - OrderByParseError
+          - OrderByTokenError
+          - PaginationNotSupported
+          - PassiveServerConfigurationError
+          - PassiveServerMissingHaBackbone
+          - PasswordFailedRequirements
+          - RedirectPolicyTypeDisabled
+          - ReplicatedServerLimitReached
+          - ReplicationOperationNotAllowed
+          - ResetServerServicesRequired
+          - ResourceFieldNotInConfiguration
+          - ResourceFieldNotInRestrictedZones
+          - ResourceHasCircularReference
+          - ResourceHasRecordsNotInZone
+          - ResourceNotInConfiguration
+          - ResourceNotInRestrictedZones
+          - ResourceNotInTemplate
+          - ResourceNotInView
+          - ServerCommandError
+          - ServerControlResetRequired
+          - ServerGroupNotMultiPrimary
+          - ServerGroupSizeLimitReached
+          - ServerHasAssignedDeploymentOptions
+          - ServerHasAssignedDeploymentRoles
+          - ServerIsDeploying
+          - ServerIsMultiPrimaryServerGroupMember
+          - ServerIsPassive
+          - ServerManagementAddressProtocolMismatch
+          - ServerNotActive
+          - ServerNotDisabled
+          - ServerNotManaged
+          - ServerNotStandaloneServer
+          - ServerNotTrusted
+          - ServerServiceInterfaceNameMismatch
+          - ServerSslHandshakeError
+          - SigningPolicyInUse
+          - SsoEnforcementRequirementsUnmet
+          - StringFieldTooBig
+          - StringFieldTooSmall
+          - TemplateApplicationFailedToStart
+          - TemplateNotAssigned
+          - TotalCountNotSupported
+          - TrustRelationshipLimitReached
+          - UdfPredefinedValueInUse
+          - UdfValidationPropertiesInUse
+          - UdfValueExceedsMaximumLength
+          - UdfValueLessThanMinimum
+          - UdfValueLessThanMinimumLength
+          - UdfValueOutsideRange
+          - UnsupportedAggregateOperator
+          - UnsupportedAggregateFilterOperator
+          - UnsupportedDeploymentOptionScope
+          - UnsupportedDeploymentRoleInterfaceType
+          - UnsupportedEmbeddableCollection
+          - UnsupportedEmbeddableResource
+          - UnsupportedFieldsOperatorForMediaType
+          - UnsupportedFilterOperator
+          - UnsupportedFilterOperatorForNullValue
+          - UnsupportedHeaderEncoding
+          - UnsupportedHeaderValue
+          - UnsupportedImportFileType
+          - UnsupportedMultiPrimaryDeploymentOption
+          - UnsupportedOrderByField
+          - UnsupportedOrderByOperator
+          - UnsupportedResourceFieldValue
+          - UnsupportedResourceType
+          - UnsupportedServerCommand
+          - ValueLessThanMinimum
+          - ValueOutsideRange
+          - WorkflowRequestNotPending
+          - WrongCsvRowFieldCount
+          - WrongResourceType
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NamingPolicyConnectorValueCollectionHalLinks:
+      type: object
+      properties:
+        next:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/namingPolicyValues?offset=2000&limit=1000
+          nullable: false
+          readOnly: true
+        prev:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/namingPolicyValues?offset=0&limit=1000
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    NamingPolicyTextValue:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyValue'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            readOnly: true
+            enum:
+            - NamingPolicyTextValue
+          textType:
+            type: string
+            description: The type of naming policy value text enforcement.
+            nullable: false
+            enum:
+            - LENGTH
+            - REGULAR_EXPRESSION
+          minLength:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: The shortest string allowed in the name. When set of 0, the
+              text string is optional.
+            format: int32
+            example: 0
+          maxLength:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: The longest string allowed in the name. When set of 0, the
+              range is unbound.
+            format: int32
+            example: 0
+          regularExpression:
+            type: string
+            description: The regular expression to restrict the text string.
+            example: '[a-z][0-9]'
+    NamingPolicyConnectorValueResourceLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /namingPolicyValues/12345
+          nullable: false
+          readOnly: true
+        collection:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /namingPolicyValues
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    NamingPolicyIntegerValue:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyValue'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            readOnly: true
+            enum:
+            - NamingPolicyIntegerValue
+          min:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: The start value for the numeric range.
+            format: int32
+            example: 1
+          max:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: The end value for the numeric range. A value of 0 indicates
+              that the range is unbounded.
+            format: int32
+            example: 0
+    NamingPolicyRequiredValuePostRequestBody:
+      required:
+      - elements
+      - name
+      - type
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyRequiredValue'
+    NamingPolicyIncrementalValuePostRequestBody:
+      required:
+      - incrementType
+      - incrementalRole
+      - name
+      - paddingType
+      - type
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyIncrementalValue'
+    NamingPolicyIntegerValuePostRequestBody:
+      required:
+      - name
+      - type
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyIntegerValue'
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 403
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Forbidden
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - AccessDenied
+          - CreateNotAllowed
+          - DeleteLastLinkNotAllowed
+          - DeleteLastStandbyServerNotAllowed
+          - DeleteNotAllowed
+          - DisableHaServerServiceNotSupported
+          - EnableHaServerServiceNotSupported
+          - FieldUpdateNotAllowed
+          - FileSizeTooBig
+          - InvalidAuthorizationScheme
+          - OperationNotPermitted
+          - ReadOnlySession
+          - ReadOnlySessionOnPrimary
+          - ResourceInUse
+          - ServerIsF5PoolMember
+          - ServerInReplication
+          - UpdateNotAllowed
+          - WorkflowRequestApproveDenyNotAllowed
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 401
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Unauthorized
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - InvalidAuthorizationCredentials
+          - InvalidServerPassword
+          - InvalidUsernameOrApiKey
+          - InvalidUsernameOrPassword
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NamingPolicyIncrementalValue:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyValue'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            readOnly: true
+            enum:
+            - NamingPolicyIncrementalValue
+          incrementalRole:
+            type: string
+            description: The incremental counter type. The value can be Counter to
+              make the value a sequential counter or Unique Name to use the value
+              to ensure that the names are unique. When you select Counter, the value
+              starts at a specified value and increments each time the naming policy
+              creates a name. When you select Unique Name, the value increments only
+              to ensure that generated names are unique.
+            nullable: false
+            enum:
+            - UNIQUE_NAME
+            - COUNTER
+          incrementType:
+            type: string
+            description: The number system for the incremental value.
+            nullable: false
+            enum:
+            - DECIMAL
+            - HEXADECIMAL
+          paddingType:
+            type: string
+            description: The padding that is added to the incremental value. Simple
+              padding pads the incremental value with a fixed number of leading zeros.
+              Global padding pads the incremental value with leading zeros to make
+              the entire name generated by the policy a specific length.
+            nullable: false
+            enum:
+            - NONE
+            - SIMPLE
+            - GLOBAL
+          sequenceStart:
+            type: integer
+            description: The starting value for the incremental value.
+            format: int32
+            example: 10
+          sequenceIncrement:
+            type: integer
+            description: The amount by which to increment the value each time it's
+              used.
+            format: int32
+            example: 5
+          paddingLength:
+            type: integer
+            description: The length of the padding. For simple padding, the value
+              determines how many digits are used for the incremental value. For global
+              padding, the value determines the overall length of the name generated
+              by the naming policy.
+            format: int32
+            example: 5
+          missingValueReuseEnabled:
+            type: boolean
+            description: Determines whether the naming policy reuses numeric values
+              if they're available.
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 404
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Not Found
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerNotConnected
+          - CannotConnectToServer
+          - InlinedResourceNotFound
+          - NetworkNotFoundForAddress
+          - PassiveServerNotConnected
+          - ResourceNotFound
+          - ResourceFieldNotFound
+          - ServerGroupHasNoMembers
+          - ServerNotConnected
+          - ServerServiceInterfaceNotConnected
+          - WrongResourceCollection
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NamingPolicyRequiredValue:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyValue'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            readOnly: true
+            enum:
+            - NamingPolicyRequiredValue
+          elements:
+            minItems: 1
+            type: array
+            description: A list of value pairs used to enforce a naming convention
+              of a naming policy.
+            nullable: false
+            items:
+              $ref: '#/components/schemas/NameValuePairBean'
+    NamingPolicyTextValuePostRequestBody:
+      required:
+      - name
+      - textType
+      - type
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyTextValue'
+    NamingPolicyConnectorValuePostRequestBody:
+      required:
+      - connector
+      - name
+      - type
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyConnectorValue'
+    NamingPolicyConnectorValue:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/NamingPolicyValue'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            readOnly: true
+            enum:
+            - NamingPolicyConnectorValue
+          connector:
+            type: string
+            description: A character used to separate elements in a filename; typically,
+              - (hyphen) or _ (underscore) are used.
+            nullable: false
+            example: '-'
+    CollectionTotalCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    NamingPolicyValue:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+          readOnly: true
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name of the naming policy value.
+          nullable: false
+          example: naming policy value name
+      description: A list of naming policy values.
+      discriminator:
+        propertyName: type
+    NameValuePairBean:
+      type: object
+      properties:
+        name:
+          minLength: 1
+          pattern: ^.*\S+.*$
+          type: string
+          description: The name for the value.
+          nullable: false
+          example: Test
+        value:
+          type: string
+          description: The value to be inserted.
+          example: Text
+      description: An attribute-value pair defined for the custom service in the TACACS+
+        server.
+  examples:
+    namingPolicyValueExampleIncremental:
+      summary: Create a naming policy incremental value
+      description: Creates a naming policy incremental value using a decimal counter
+        starting at 1 and incrementing by 1.
+      value:
+        type: NamingPolicyIncrementalValue
+        name: example-incremental
+        incrementalRole: COUNTER
+        incrementType: DECIMAL
+        paddingType: NONE
+    namingPolicyValueExampleRequired:
+      summary: Create a naming policy required value
+      description: Creates a naming policy required value using the two supplied possible
+        values.
+      value:
+        type: NamingPolicyRequiredValue
+        name: example-required
+        elements:
+        - name: main
+          value: toronto
+        - name: secondary
+          value: vancouver
+    namingPolicyValueExampleInteger:
+      summary: Create a naming policy integer value
+      description: Creates a naming policy integer value with a minimum of 1 and a
+        maximum of 25.
+      value:
+        type: NamingPolicyIntegerValue
+        name: example-integer
+        min: 1
+        max: 25
+    namingPolicyValueExampleConnector:
+      summary: Create a naming policy connector value
+      description: Creates a naming policy connector value using "-" as the connector.
+      value:
+        type: NamingPolicyConnectorValue
+        name: example-connector
+        connector: '-'
+    namingPolicyValueExampleText:
+      summary: Create a naming policy text value
+      description: Creates a naming policy text value with a minimum length of 2 and
+        a maximum length of 10.
+      value:
+        type: NamingPolicyTextValue
+        name: example-text
+        textType: LENGTH
+        minLength: 2
+        maxLength: 10
+  headers:
+    Location:
+      description: The location of the resource
+      required: true
+      schema:
+        type: string
+  parameters:
+    x-bcn-change-control-comment:
+      name: x-bcn-change-control-comment
+      in: header
+      description: The change control comment.
+      required: false
+      schema:
+        type: string
+        example: ''
+    total:
+      name: total
+      in: query
+      description: Return the total number of resources matching the query.
+      required: false
+      schema:
+        type: boolean
+    offset:
+      name: offset
+      in: query
+      description: The offset of the first resource returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    orderBy:
+      name: orderBy
+      in: query
+      description: The field path to order the response resources by.
+      required: false
+      schema:
+        type: string
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of resources returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    filter:
+      name: filter
+      in: query
+      description: The query filter string.
+      required: false
+      schema:
+        type: string
+    fields:
+      name: fields
+      in: query
+      description: The subset of response resource field paths.
+      required: false
+      schema:
+        type: string

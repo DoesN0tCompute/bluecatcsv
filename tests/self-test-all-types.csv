@@ -1,0 +1,5 @@
+row_id,object_type,action,config,parent,cidr,name,address,mac,description
+block_1,ip4_block,create,Default,,10.200.1.0/24,Test-Block-1,,,Test IP block 1
+network_1,ip4_network,create,Default,/IPv4/10.200.1.0/24,10.200.1.0/28,Test-Network-1,,,Test network 1
+address_1,ip4_address,create,Default,/IPv4/10.200.1.0/28,,server-1,10.200.1.5,00:11:22:33:44:55,Test server 1
+address_2,ip4_address,update,Default,/IPv4/10.200.1.0/28,,server-1-updated,10.200.1.5,00:11:22:33:44:55,Updated server 1

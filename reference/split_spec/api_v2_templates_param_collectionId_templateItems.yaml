@@ -1,0 +1,1064 @@
+openapi: 3.0.1
+info:
+  title: BlueCat Address Manager RESTful v2 API
+  description: 'The **BlueCat Address Manager RESTful v2 API** is a new RESTful API
+    for Address Manager that presents Address Manager objects as resources. Each resource
+    has a unique endpoint, and related resources are grouped in collections. To fetch
+    an individual resource, a `GET` request is sent to the resource''s endpoint. To
+    fetch all resources in a collection, a `GET` request is sent to the collection''s
+    endpoint.
+
+
+    The RESTful v2 API is [hypermedia driven](https://en.wikipedia.org/wiki/HATEOAS)
+    and uses the [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language)
+    format for representing links. When navigating through the API, you can use those
+    links to navigate to related resources or child resources of the requested endpoint.
+    The API supports the following media types for most endpoints:  `application/hal+json`,
+    `application/json`, and `text/csv`.  For authentication, the API supports both
+    `Basic` and `Bearer` HTTP authentication schemes.
+
+
+    To get started, create a session and receive credentials for `Basic` authentication
+    by sending a `POST` request to the [/sessions](#/User%20and%20Group%20Resources/postSession)
+    endpoint, with a message body containing the user''s credentials:
+
+
+    ```{"username":"apiuser", "password":"apipass"}```
+
+
+    The response will contain an `apiToken` field that can be entered with the username
+    in the Swagger UI **Authorize** dialog. The response will also contain a `basicAuthenticationCredentials`
+    field containing a base64 encoding of the requester''s username and API token
+    delimited by a colon. This string can be injected directly into request `Authorization`
+    headers in the following format:
+
+
+    ```Authorization: Basic YXBpOlQ0OExOT3VIRGhDcnVBNEo1bGFES3JuS3hTZC9QK3pjczZXTzBJMDY=```
+
+
+    For full details on API format and authentication methods, refer to the Address
+    Manager RESTful v2 API Guide on the BlueCat Documentation Portal.'
+  termsOfService: https://docs.bluecatnetworks.com/r/Terms-and-Conditions/Terms-and-Conditions
+  contact:
+    name: BlueCat Customer Care
+    url: https://care.bluecatnetworks.com/
+  license:
+    name: BlueCat License Agreements
+    url: https://bluecatnetworks.com/license-agreements/
+  version: 9.6.0
+paths:
+  /api/v2/templates/{collectionId}/templateItems:
+    get:
+      tags:
+      - IPv4 and IPv6 Resources
+      summary: Retrieve a collection of template items
+      description: Retrieve a collection of IPv4 template items within an IPv4 template.
+      operationId: getTemplateTemplateItems
+      parameters:
+      - $ref: '#/components/parameters/fields'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/filter'
+      - $ref: '#/components/parameters/orderBy'
+      - $ref: '#/components/parameters/total'
+      - $ref: '#/components/parameters/collectionId'
+      responses:
+        '200':
+          description: A collection of template items
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                properties:
+                  _links:
+                    $ref: '#/components/schemas/IPv4DHCPRangeTemplateItemCollectionHalLinks'
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      allOf:
+                      - oneOf:
+                        - $ref: '#/components/schemas/IPv4DHCPRangeTemplateItem'
+                        - $ref: '#/components/schemas/IPv4GatewayTemplateItem'
+                        - $ref: '#/components/schemas/IPv4GroupTemplateItem'
+                        - $ref: '#/components/schemas/IPv4ReservedRangeTemplateItem'
+                      - type: object
+                        properties:
+                          _links:
+                            $ref: '#/components/schemas/IPv4DHCPRangeTemplateItemResourceLinks'
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    $ref: '#/components/schemas/CollectionCount'
+                  totalCount:
+                    $ref: '#/components/schemas/CollectionTotalCount'
+                  data:
+                    type: array
+                    nullable: false
+                    readOnly: true
+                    items:
+                      oneOf:
+                      - $ref: '#/components/schemas/IPv4DHCPRangeTemplateItem'
+                      - $ref: '#/components/schemas/IPv4GatewayTemplateItem'
+                      - $ref: '#/components/schemas/IPv4GroupTemplateItem'
+                      - $ref: '#/components/schemas/IPv4ReservedRangeTemplateItem'
+            text/csv:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    post:
+      tags:
+      - IPv4 and IPv6 Resources
+      summary: Create a new template item
+      description: Create a new IPv4 template item within an IPv4 template.
+      operationId: postTemplateTemplateItem
+      parameters:
+      - $ref: '#/components/parameters/x-bcn-change-control-comment'
+      - $ref: '#/components/parameters/collectionId'
+      requestBody:
+        content:
+          application/hal+json:
+            schema:
+              discriminator:
+                propertyName: type
+                mapping:
+                  IPv4DHCPRangeTemplateItem: '#/components/schemas/IPv4DHCPRangeTemplateItemPostRequestBody'
+                  IPv4GroupTemplateItem: '#/components/schemas/IPv4GroupTemplateItemPostRequestBody'
+                  IPv4ReservedRangeTemplateItem: '#/components/schemas/IPv4ReservedRangeTemplateItemPostRequestBody'
+              oneOf:
+              - $ref: '#/components/schemas/IPv4DHCPRangeTemplateItemPostRequestBody'
+              - $ref: '#/components/schemas/IPv4GroupTemplateItemPostRequestBody'
+              - $ref: '#/components/schemas/IPv4ReservedRangeTemplateItemPostRequestBody'
+            examples:
+              templateItemExampleIpv4DhcpRange:
+                $ref: '#/components/examples/templateItemExampleIpv4DhcpRange'
+              templateItemExampleIpv4Group:
+                $ref: '#/components/examples/templateItemExampleIpv4Group'
+              templateItemExampleIpv4ReservedRange:
+                $ref: '#/components/examples/templateItemExampleIpv4ReservedRange'
+            encoding: {}
+          application/json:
+            schema:
+              discriminator:
+                propertyName: type
+                mapping:
+                  IPv4DHCPRangeTemplateItem: '#/components/schemas/IPv4DHCPRangeTemplateItemPostRequestBody'
+                  IPv4GroupTemplateItem: '#/components/schemas/IPv4GroupTemplateItemPostRequestBody'
+                  IPv4ReservedRangeTemplateItem: '#/components/schemas/IPv4ReservedRangeTemplateItemPostRequestBody'
+              oneOf:
+              - $ref: '#/components/schemas/IPv4DHCPRangeTemplateItemPostRequestBody'
+              - $ref: '#/components/schemas/IPv4GroupTemplateItemPostRequestBody'
+              - $ref: '#/components/schemas/IPv4ReservedRangeTemplateItemPostRequestBody'
+            examples:
+              templateItemExampleIpv4DhcpRange:
+                $ref: '#/components/examples/templateItemExampleIpv4DhcpRange'
+              templateItemExampleIpv4Group:
+                $ref: '#/components/examples/templateItemExampleIpv4Group'
+              templateItemExampleIpv4ReservedRange:
+                $ref: '#/components/examples/templateItemExampleIpv4ReservedRange'
+            encoding: {}
+      responses:
+        '201':
+          description: The newly created template item
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/hal+json:
+              schema:
+                allOf:
+                - oneOf:
+                  - $ref: '#/components/schemas/IPv4DHCPRangeTemplateItem'
+                  - $ref: '#/components/schemas/IPv4GroupTemplateItem'
+                  - $ref: '#/components/schemas/IPv4ReservedRangeTemplateItem'
+                - type: object
+                  properties:
+                    _links:
+                      $ref: '#/components/schemas/IPv4DHCPRangeTemplateItemResourceLinks'
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/IPv4DHCPRangeTemplateItem'
+                - $ref: '#/components/schemas/IPv4GroupTemplateItem'
+                - $ref: '#/components/schemas/IPv4ReservedRangeTemplateItem'
+        '400':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: The error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+security:
+- basicAuthentication: []
+- bearerToken: []
+tags:
+- name: Administrator Resources
+  description: Operations for access rights, configurations, imports, password policies,
+    server patches, services, settings,  user-defined field definitions, user-defined
+    link definitions and workflow requests.
+- name: Authenticator Resources
+  description: Operations for authenticators, Kerberos realms, service principals
+    and key distribution centers.
+- name: Database Management and Replication Resources
+  description: Operations for database replication, database backups and trust relationships.
+- name: Deployment Option Resources
+  description: Operations for deployment options, deployment option definitions, access
+    control lists and match elements.
+- name: Deployment Role Resources
+  description: Operations for deployment roles.
+- name: Device Resources
+  description: Operations for devices, device types and subtypes.
+- name: DHCP Resources
+  description: Operations for DHCP client classes and subclasses, DHCP zone groups
+    and zone declarations, DHCP deployment option definitions and  DHCP vendor profiles.
+- name: DNSSEC Resources
+  description: Operations for DNSSEC signing policies and key management, and TSIG
+    zone signing keys.
+- name: IPv4 and IPv6 Resources
+  description: Operations for addresses, blocks, IP groups, leases, networks, DHCP
+    ranges, IP reconciliation policies and discovered devices, and IP templates.
+- name: Location Resources
+  description: Operations for locations and annotated resources
+- name: MAC Address and Client Identifier Resources
+  description: Operations for DHCP client identifiers, DHCP unique identifiers, MAC
+    addresses and MAC address pools.
+- name: Monitoring Resources
+  description: Operations for events, logs, notification groups, reports and report
+    schedules, transactions, and user sessions.
+- name: Resource Record Resources
+  description: Operations for resource records.
+- name: Server Resources
+  description: Operations for deployments and deployment schedules, interfaces, servers,
+    server groups, server services.
+- name: Tag Resources
+  description: Operations for tags, tag groups, and tagged resources.
+- name: TFTP Resources
+  description: Operations for TFTP groups and files.
+- name: User and Group Resources
+  description: Operations for users and groups, favorites and tasks.
+- name: View and Zone Resources
+  description: Operations for resource record naming policies, DNS response policies,
+    zones and zone templates, and views.
+components:
+  parameters:
+    collectionId:
+      name: collectionId
+      in: path
+      description: The ID of the collection resource.
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+    x-bcn-change-control-comment:
+      name: x-bcn-change-control-comment
+      in: header
+      description: The change control comment.
+      required: false
+      schema:
+        type: string
+        example: ''
+    total:
+      name: total
+      in: query
+      description: Return the total number of resources matching the query.
+      required: false
+      schema:
+        type: boolean
+    offset:
+      name: offset
+      in: query
+      description: The offset of the first resource returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    orderBy:
+      name: orderBy
+      in: query
+      description: The field path to order the response resources by.
+      required: false
+      schema:
+        type: string
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of resources returned in the response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    filter:
+      name: filter
+      in: query
+      description: The query filter string.
+      required: false
+      schema:
+        type: string
+    fields:
+      name: fields
+      in: query
+      description: The subset of response resource field paths.
+      required: false
+      schema:
+        type: string
+  schemas:
+    IPv4DHCPRangeTemplateItemResourceLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /templateItems/12345
+          nullable: false
+          readOnly: true
+        collection:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /templateItems
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    IPv4GroupTemplateItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Ipv4TemplateItem'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            enum:
+            - IPv4GroupTemplateItem
+          name:
+            minLength: 1
+            pattern: ^.*\S+.*$
+            type: string
+            description: The name of the IPv4 group.
+            nullable: false
+            example: Example IPv4 Group
+          rangeDefinitionFormat:
+            type: string
+            description: The counting direction for the defined IP address size from
+              the specified offset position.
+            nullable: false
+            enum:
+            - OFFSET_SIZE_FROM_START
+            - OFFSET_SIZE_FROM_END
+          size:
+            maximum: 9223372036854775807
+            minimum: 1
+            type: integer
+            description: The number of addresses defined in the IP group setting.
+            format: int64
+            nullable: false
+    CollectionCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    ConflictError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 409
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Conflict
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - DeploymentAlreadyQueued
+          - IpAddressConflictsWithSplitNetwork
+          - IpGroupConflictsWithSplitNetwork
+          - IpRangeConflictsWithSplitNetwork
+          - ResourceAlreadyExists
+          - ResourceConflictsWithOther
+          - StaleResourceState
+          - WorkflowRequestAlreadyPending
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 400
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Bad Request
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerConfigurationError
+          - ActiveServerMissingHaBackbone
+          - AddressHasLinkedRecords
+          - AddressIsBroadcastAddress
+          - AddressIsNetworkId
+          - AddressIsNetworkRouterAnycast
+          - AddressIsReserved
+          - AddressNotInNetwork
+          - AddressNotInRestrictedRanges
+          - AddressProtocolMatch
+          - AddressProtocolMismatch
+          - ArrayFieldSizeTooBig
+          - ArrayFieldSizeTooSmall
+          - AuthenticatorMismatch
+          - BlankFieldValue
+          - BrokenMandatoryDependency
+          - BrokenOptionalDependency
+          - CannotAssociateServerAssignedOption
+          - CannotEnableSso
+          - CannotFailoverWhileNodesDisconnected
+          - CannotFetchGroupsFromLdapAuthenticator
+          - ConflictingFieldsList
+          - ConflictingOrderBySortDirections
+          - ConflictingResourceFieldValues
+          - CreateUpdateNetworkGatewayNotSupported
+          - DatabaseNotInReplicatedState
+          - DatabaseReplicationInProgress
+          - DedicatedManagementNotEnabled
+          - DeleteAuthenticatorNotAllowed
+          - DeploymentFailedToStart
+          - DhcpDeploymentValidationNotEnabled
+          - DnsDeploymentValidationNotEnabled
+          - DuplicateFieldValue
+          - DuplicateFilterField
+          - DuplicateOrderByField
+          - DuplicateOrderByOperator
+          - DurationValueNotDivisibleBy
+          - DurationValueOutsideRange
+          - EmptyFieldValue
+          - EmptyRequestBody
+          - FailoverTargetAlreadyPrimaryServer
+          - FieldsParseError
+          - FieldsTokenError
+          - FieldHasPatchOnlyUpdate
+          - FieldNotPatchable
+          - FieldValueTooSmall
+          - FilterNeedsRefinement
+          - FilterParseError
+          - FilterTokenError
+          - ImportInProgress
+          - IncompatibleServerProfile
+          - IncompatibleServerVersion
+          - InterfaceRedundancyConfigurationError
+          - InvalidAnycastAddress
+          - InvalidAsciiString
+          - InvalidCsv
+          - InvalidDateValue
+          - InvalidDnsFeedLicense
+          - InvalidDuidValue
+          - InvalidDurationValue
+          - InvalidEmailAddress
+          - InvalidBase64Value
+          - InvalidEnumValue
+          - InvalidEnumZoneAbsoluteNameLength
+          - InvalidEnumZoneName
+          - InvalidFieldName
+          - InvalidFieldPath
+          - InvalidFileCharacterEncoding
+          - InvalidFileContentDisposition
+          - InvalidFileDataValue
+          - InvalidFilterAddress
+          - InvalidFilterAddressRange
+          - InvalidFilterAddressRangeSize
+          - InvalidFilterCountsAndPercentages
+          - InvalidFilterDate
+          - InvalidFilterEnumValue
+          - InvalidFilterField
+          - InvalidFilterMacAddress
+          - InvalidFilterPartialAddress
+          - InvalidFilterPercentage
+          - InvalidFilterValue
+          - InvalidFilterValueType
+          - InvalidFullyQualifiedDomainName
+          - InvalidFullyQualifiedDomainNameField
+          - InvalidGatewayMountPointValue
+          - InvalidHeaderValue
+          - InvalidInlinedResource
+          - InvalidIpv4AddressValue
+          - InvalidIpv4LoopbackPrefixLength
+          - InvalidIpv4RangeValue
+          - InvalidIpv6AddressValue
+          - InvalidIpv6BlockPrefixLength
+          - InvalidIpv6LoopbackPrefixLength
+          - InvalidIpv6NetworkPrefixLength
+          - InvalidIpv6RangeValue
+          - InvalidIpAddressState
+          - InvalidIpAddressValue
+          - InvalidIpAddressOrFullyQualifiedDomainNameValue
+          - InvalidIpBlockValue
+          - InvalidIpRangeValue
+          - InvalidLdapGroupName
+          - InvalidLimitParameterValue
+          - InvalidLocationCode
+          - InvalidMacAddressValue
+          - InvalidMatchCriteria
+          - InvalidMoveDestination
+          - InvalidNumberZoneAbsoluteNameLength
+          - InvalidNtpServerAddressForStratum
+          - InvalidOffsetParameterValue
+          - InvalidPaginationParameter
+          - InvalidPartialMacAddressFilter
+          - InvalidPolicyItemNameValue
+          - InvalidPrivateKeyValue
+          - InvalidQueryParameterValue
+          - InvalidRegularExpression
+          - InvalidResourceFieldValue
+          - InvalidResourceId
+          - InvalidResourceRecordData
+          - InvalidResourceType
+          - InvalidRetentionRestrictions
+          - InvalidServerPatchFile
+          - InvalidSplitPointAddress
+          - InvalidStartEndDates
+          - InvalidStringCharacters
+          - InvalidStringFieldPrefix
+          - InvalidTrustRelationshipCredentials
+          - InvalidTopLevelMerge
+          - InvalidTtlValue
+          - InvalidUdfDateValue
+          - InvalidUdfDefaultValue
+          - InvalidUdfEmailValue
+          - InvalidUdfNumberValue
+          - InvalidUdfPredefinedValue
+          - InvalidUdfPredefinedValues
+          - InvalidUdfUrlValue
+          - InvalidUdfValidationProperties
+          - InvalidUdfValue
+          - InvalidUidValue
+          - InvalidUndoTransactionId
+          - InvalidUrlScheme
+          - InvalidUrlValue
+          - InvalidX509CertificateValue
+          - InvalidZoneName
+          - IpRangeBroadcastOrNetworkIdAssigned
+          - IpRangeDoesNotOverlap
+          - IpRangeExcludesAssignedAddresses
+          - IpRangeExcludesChildRanges
+          - IpRangeExcludesDhcpRanges
+          - IpRangeExcludesGateway
+          - IpRangeIncludesGateway
+          - IpRangeNotAlignedOnRangeBoundary
+          - IpRangeOutsideNetworkBlockBoundary
+          - IpRangeOutsideParent
+          - IpRangeOverlapsSiblings
+          - IpRangeOverlapsRangeInOtherConfiguration
+          - IpRangePartiallyIncludesChildRanges
+          - IpRangeTooBig
+          - IpRangeTooSmall
+          - JsonDeserializationError
+          - JsonParseError
+          - JsonFieldParseError
+          - MacAddressInUse
+          - MismatchedLocationCodeParent
+          - MismatchedManagementAndServicesInterfaces
+          - MismatchedMergeTypes
+          - MissingMandatoryChangeControlComment
+          - MissingMergeDestinationInSiblings
+          - MissingPatchableField
+          - MissingQueryParameter
+          - MissingRequiredDeploymentRoleInterface
+          - MissingRequiredField
+          - MissingRequiredFilterField
+          - MissingRequiredFilterPredicate
+          - MoveAddressUnsupportedState
+          - MoveRolesWithOptionsOnServer
+          - MultipleBgpNeighborsNotSupported
+          - MultipleQueryParameterValues
+          - MultipleValuesNotAllowed
+          - NamingPolicyViolation
+          - NamingPolicyRestrictionViolation
+          - NetworkInterfaceNotConfigured
+          - NothingToDeployForUser
+          - NoAssignedDeploymentRoles
+          - NoHsmConfiguration
+          - NoKeyDistributionCentersInRealm
+          - NoPreviousFullDeploymentForDifferential
+          - NoSpaceForAddress
+          - NoSpaceForBlock
+          - NoSpaceForNetwork
+          - NoSpaceForRange
+          - OrderByParseError
+          - OrderByTokenError
+          - PaginationNotSupported
+          - PassiveServerConfigurationError
+          - PassiveServerMissingHaBackbone
+          - PasswordFailedRequirements
+          - RedirectPolicyTypeDisabled
+          - ReplicatedServerLimitReached
+          - ReplicationOperationNotAllowed
+          - ResetServerServicesRequired
+          - ResourceFieldNotInConfiguration
+          - ResourceFieldNotInRestrictedZones
+          - ResourceHasCircularReference
+          - ResourceHasRecordsNotInZone
+          - ResourceNotInConfiguration
+          - ResourceNotInRestrictedZones
+          - ResourceNotInTemplate
+          - ResourceNotInView
+          - ServerCommandError
+          - ServerControlResetRequired
+          - ServerGroupNotMultiPrimary
+          - ServerGroupSizeLimitReached
+          - ServerHasAssignedDeploymentOptions
+          - ServerHasAssignedDeploymentRoles
+          - ServerIsDeploying
+          - ServerIsMultiPrimaryServerGroupMember
+          - ServerIsPassive
+          - ServerManagementAddressProtocolMismatch
+          - ServerNotActive
+          - ServerNotDisabled
+          - ServerNotManaged
+          - ServerNotStandaloneServer
+          - ServerNotTrusted
+          - ServerServiceInterfaceNameMismatch
+          - ServerSslHandshakeError
+          - SigningPolicyInUse
+          - SsoEnforcementRequirementsUnmet
+          - StringFieldTooBig
+          - StringFieldTooSmall
+          - TemplateApplicationFailedToStart
+          - TemplateNotAssigned
+          - TotalCountNotSupported
+          - TrustRelationshipLimitReached
+          - UdfPredefinedValueInUse
+          - UdfValidationPropertiesInUse
+          - UdfValueExceedsMaximumLength
+          - UdfValueLessThanMinimum
+          - UdfValueLessThanMinimumLength
+          - UdfValueOutsideRange
+          - UnsupportedAggregateOperator
+          - UnsupportedAggregateFilterOperator
+          - UnsupportedDeploymentOptionScope
+          - UnsupportedDeploymentRoleInterfaceType
+          - UnsupportedEmbeddableCollection
+          - UnsupportedEmbeddableResource
+          - UnsupportedFieldsOperatorForMediaType
+          - UnsupportedFilterOperator
+          - UnsupportedFilterOperatorForNullValue
+          - UnsupportedHeaderEncoding
+          - UnsupportedHeaderValue
+          - UnsupportedImportFileType
+          - UnsupportedMultiPrimaryDeploymentOption
+          - UnsupportedOrderByField
+          - UnsupportedOrderByOperator
+          - UnsupportedResourceFieldValue
+          - UnsupportedResourceType
+          - UnsupportedServerCommand
+          - ValueLessThanMinimum
+          - ValueOutsideRange
+          - WorkflowRequestNotPending
+          - WrongCsvRowFieldCount
+          - WrongResourceType
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    IPv4DHCPRangeTemplateItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Ipv4TemplateItem'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            enum:
+            - IPv4DHCPRangeTemplateItem
+          rangeDefinitionFormat:
+            type: string
+            description: The type of method that will be used to create a DHCP range.
+            nullable: false
+            enum:
+            - OFFSET_SIZE_FROM_START
+            - OFFSET_SIZE_FROM_END
+            - OFFSETS
+            - OFFSET_PERCENTAGE_FROM_START
+            - OFFSET_PERCENTAGE_FROM_END
+          endOffset:
+            maximum: 9223372036854775807
+            minimum: 1
+            type: integer
+            description: The starting or ending position of the DHCP range.
+            format: int64
+            example: 10
+          size:
+            maximum: 9223372036854775807
+            minimum: 1
+            type: integer
+            description: The size of the DHCP range. When the method is OFFSETS_AND_SIZE,
+              the value is the size of the DHCP range. When the method is OFFSETS_AND_PERCENTAGE,
+              the value is the size of the DHCP range proportional to the parent network
+              size as a percentage.
+            format: int64
+            example: 20
+          splitAroundStaticAddresses:
+            type: boolean
+            description: Indicates whether the DHCP range will automatically be split
+              around any static, reserved, and gateway addresses in the network that
+              are within the DHCP range.
+            nullable: false
+    IPv4ReservedRangeTemplateItemPostRequestBody:
+      required:
+      - rangeDefinitionFormat
+      - size
+      - startOffset
+      - type
+      allOf:
+      - $ref: '#/components/schemas/IPv4ReservedRangeTemplateItem'
+    IPv4GatewayTemplateItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Ipv4TemplateItem'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            enum:
+            - IPv4GatewayTemplateItem
+          name:
+            type: string
+            description: The name of the template item.
+            readOnly: true
+          rangeDefinitionFormat:
+            type: string
+            description: The type of method that will be used to create the gateway
+              template.
+            nullable: false
+            enum:
+            - OFFSET_SIZE_FROM_START
+            - OFFSET_SIZE_FROM_END
+    IPv4DHCPRangeTemplateItemPostRequestBody:
+      required:
+      - rangeDefinitionFormat
+      - startOffset
+      - type
+      allOf:
+      - $ref: '#/components/schemas/IPv4DHCPRangeTemplateItem'
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 403
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Forbidden
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - AccessDenied
+          - CreateNotAllowed
+          - DeleteLastLinkNotAllowed
+          - DeleteLastStandbyServerNotAllowed
+          - DeleteNotAllowed
+          - DisableHaServerServiceNotSupported
+          - EnableHaServerServiceNotSupported
+          - FieldUpdateNotAllowed
+          - FileSizeTooBig
+          - InvalidAuthorizationScheme
+          - OperationNotPermitted
+          - ReadOnlySession
+          - ReadOnlySessionOnPrimary
+          - ResourceInUse
+          - ServerIsF5PoolMember
+          - ServerInReplication
+          - UpdateNotAllowed
+          - WorkflowRequestApproveDenyNotAllowed
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 401
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Unauthorized
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - InvalidAuthorizationCredentials
+          - InvalidServerPassword
+          - InvalidUsernameOrApiKey
+          - InvalidUsernameOrPassword
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          nullable: false
+          readOnly: true
+          enum:
+          - 404
+        reason:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - Not Found
+        code:
+          type: string
+          nullable: false
+          readOnly: true
+          enum:
+          - ActiveServerNotConnected
+          - CannotConnectToServer
+          - InlinedResourceNotFound
+          - NetworkNotFoundForAddress
+          - PassiveServerNotConnected
+          - ResourceNotFound
+          - ResourceFieldNotFound
+          - ServerGroupHasNoMembers
+          - ServerNotConnected
+          - ServerServiceInterfaceNotConnected
+          - WrongResourceCollection
+        message:
+          type: string
+          nullable: false
+          readOnly: true
+    IPv4DHCPRangeTemplateItemCollectionHalLinks:
+      type: object
+      properties:
+        next:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/templateItems?offset=2000&limit=1000
+          nullable: false
+          readOnly: true
+        prev:
+          type: object
+          properties:
+            href:
+              type: string
+              nullable: false
+              readOnly: true
+              example: /api/v2/templateItems?offset=0&limit=1000
+          nullable: false
+          readOnly: true
+      nullable: false
+      readOnly: true
+    IPv4ReservedRangeTemplateItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Ipv4TemplateItem'
+      - type: object
+        properties:
+          type:
+            type: string
+            description: The resource type.
+            enum:
+            - IPv4ReservedRangeTemplateItem
+          rangeDefinitionFormat:
+            type: string
+            description: The method that will be used to create the reserved address
+              range of the IPv4 template.
+            nullable: false
+            enum:
+            - OFFSET_SIZE_FROM_START
+            - OFFSET_SIZE_FROM_END
+          size:
+            maximum: 9223372036854775807
+            minimum: 1
+            type: integer
+            description: The number of addresses in the address block.
+            format: int64
+            nullable: false
+            example: 10
+    IPv4GroupTemplateItemPostRequestBody:
+      required:
+      - name
+      - rangeDefinitionFormat
+      - size
+      - startOffset
+      - type
+      allOf:
+      - $ref: '#/components/schemas/IPv4GroupTemplateItem'
+    CollectionTotalCount:
+      type: integer
+      format: int32
+      nullable: false
+      readOnly: true
+    Ipv4TemplateItem:
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          description: The resource identifier.
+          format: int64
+          example: 12345
+        type:
+          type: string
+          description: The resource type.
+        name:
+          type: string
+          description: The name of the template item.
+        startOffset:
+          maximum: 9223372036854775807
+          minimum: 1
+          type: integer
+          description: The start offset of the IPv4 template item.
+          format: int64
+          nullable: false
+          example: 10
+      description: A list of IPv4 template items.
+      discriminator:
+        propertyName: type
+  examples:
+    templateItemExampleIpv4Group:
+      summary: Create a IPv4 group template item with an offset from the end and size
+      description: Creates a new IPv4 group template item defined by the offset from
+        the end and size. The group starts with an offset of 20 IP addresses from
+        the end of the parent range and contains 10 IP addresses.
+      value:
+        type: IPv4GroupTemplateItem
+        name: example-item
+        rangeDefinitionFormat: OFFSET_SIZE_FROM_END
+        startOffset: 20
+        size: 10
+    templateItemExampleIpv4ReservedRange:
+      summary: Create a IPv4 reserved range template item with an offset and size
+      description: Creates a new IPv4 reserved range template item defined by the
+        offset and size. The reserved range starts with an offset of 10 IP addresses
+        and contains20 IP addresses.
+      value:
+        type: IPv4ReservedRangeTemplateItem
+        rangeDefinitionFormat: OFFSET_SIZE_FROM_START
+        startOffset: 10
+        size: 20
+    templateItemExampleIpv4DhcpRange:
+      summary: Create a IPv4 DHCP range template item with an offset and size
+      description: Creates a new IPv4 DHCP range template item defined by the offset
+        and size. The DHCP range starts with an offset of 10 IP addresses and contains
+        20 IP addresses.
+      value:
+        type: IPv4DHCPRangeTemplateItem
+        rangeDefinitionFormat: OFFSET_SIZE_FROM_START
+        startOffset: 10
+        size: 20
+  headers:
+    Location:
+      description: The location of the resource
+      required: true
+      schema:
+        type: string

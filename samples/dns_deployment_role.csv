@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,*config,zone_path,name,roleType,interfaces,nsRecordTtl
+1,dns_deployment_role,create,Default,Internal/example.local,DNS-Primary,PRIMARY,server1,3600
+2,dns_deployment_role,create,Default,Internal/example.local,DNS-Secondary,SECONDARY,server2,3600
+3,dns_deployment_role,create,Default,Internal/corp.example.local,DNS-Corp-Primary,PRIMARY,server1,3600

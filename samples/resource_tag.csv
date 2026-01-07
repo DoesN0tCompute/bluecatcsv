@@ -1,0 +1,4 @@
+*row_id,*object_type,*action,config,resource_type,resource_path,tag_name
+1,resource_tag,create,Default,ip4_network,10.1.1.0/24,Production
+2,resource_tag,create,Default,ip4_network,10.1.2.0/24,Development
+3,resource_tag,create,Default,dns_zone,example.com,IT-Team

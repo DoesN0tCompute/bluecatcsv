@@ -1,0 +1,8 @@
+row_id,object_type,action,user_type,user_name,resource_type,resource_path,config,default_access_level,deployments_allowed,quick_deployments_allowed,selective_deployments_allowed,workflow_level,access_overrides
+1,access_right,create,user,operator,Configuration,Default,,VIEW,false,false,false,NONE,
+2,access_right,create,group,NetworkAdmins,Configuration,Production,,ADD,true,true,false,APPROVE,
+3,access_right,create,user,developer,,,Default,VIEW,false,false,false,NONE,IPv4Address:FULL|HostRecord:ADD
+4,access_right,create,group,DNSTeam,Configuration,Default,,CHANGE,false,true,true,RECOMMEND,TXTRecord:FULL|MXRecord:FULL
+5,access_right,create,user,readonly,Configuration,Default,,VIEW,false,false,false,NONE,
+6,access_right,create,user,netadmin,IPv4Block,10.0.0.0/8,Default,FULL,true,true,true,APPROVE,
+7,access_right,create,group,SecurityTeam,Zone,example.com,Default,CHANGE,false,false,false,RECOMMEND,

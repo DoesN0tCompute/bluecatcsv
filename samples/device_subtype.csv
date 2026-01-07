@@ -1,0 +1,6 @@
+*row_id,*object_type,*action,device_type,name
+1,device_subtype,create,Fortinet,FortiGate-600E
+2,device_subtype,create,Fortinet,FortiGate-100F
+3,device_subtype,create,Cisco,ASA-5505
+4,device_subtype,create,Cisco,Catalyst-3750
+5,device_subtype,create,Custom-Switch,48-Port-PoE
