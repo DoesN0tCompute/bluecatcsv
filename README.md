@@ -34,10 +34,12 @@ A robust, high-performance CLI tool for importing, exporting, and managing BlueC
 ## Supported Resources
 
 ### IP Address Management
+
 - **IPv4**: Blocks, Networks (with Auto-Discovery), Addresses, Address Groups, DHCP Ranges
 - **IPv6**: Blocks, Networks, Addresses, DHCPv6 Ranges
 
 ### DNS Management
+
 - Zones
 - Host Records (A/AAAA)
 - Alias Records (CNAME)
@@ -48,15 +50,18 @@ A robust, high-performance CLI tool for importing, exporting, and managing BlueC
 - Generic Records (custom types: CAA, SSHFP, TLSA, etc.)
 
 ### DHCP Management
+
 - IPv4/IPv6 DHCP Ranges
 - DHCP Client/Service Deployment Options
 - DHCP Deployment Roles (failover support)
 
 ### Infrastructure
+
 - Hierarchical Locations with geographic coordinates
 - Location associations for all resources
 
 ### Metadata & Organization
+
 - **Tags & Tag Groups**: Organize and categorize resources with tags
 - **User-Defined Fields (UDFs)**: Custom metadata fields for all resource types
 - **User-Defined Links (UDLs)**: Custom relationships between resources
@@ -68,23 +73,26 @@ A robust, high-performance CLI tool for importing, exporting, and managing BlueC
 ## Quick Start
 
 ### Prerequisites
+
 - Python 3.11 or higher
 - BlueCat Address Manager v9.3+ with API v2 enabled
 
 ### Installation
 
 **Using Poetry (recommended):**
+
 ```bash
-git clone https://github.com/your-org/bluecat-csv-importer.git
-cd bluecat-csv-importer
+git clone https://github.com/DoesN0tCompute/bluecatcsv.git
+cd bluecatcsv
 poetry install
 poetry shell
 ```
 
 **Using pip:**
+
 ```bash
-git clone https://github.com/your-org/bluecat-csv-importer.git
-cd bluecat-csv-importer
+git clone https://github.com/DoesN0tCompute/bluecatcsv.git
+cd bluecatcsv
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
@@ -98,6 +106,7 @@ pip install -r requirements-dev.txt
 ### Configuration
 
 Set environment variables:
+
 ```bash
 export BAM_URL="https://bam.example.com"
 export BAM_USERNAME="api_user"
@@ -106,6 +115,7 @@ export BAM_VERIFY_SSL="true"  # Optional
 ```
 
 Or create a `config.yaml`:
+
 ```yaml
 bam:
   base_url: "https://bam.example.com"
@@ -122,6 +132,7 @@ policy:
 ## Usage
 
 ### Basic Workflow
+
 1. **Export** existing data (optional) or create a CSV file
 2. **Validate** the CSV file
 3. **Dry Run** to simulate changes
@@ -183,6 +194,7 @@ row_id,object_type,action,config,cidr,name
 ```
 
 **Key changes in v0.3.0:**
+
 - `config_path` → `config`
 - `parent_path` → `parent` (for IP hierarchy)
 
@@ -252,6 +264,7 @@ Current test coverage: **61%**
 We welcome contributions! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
 ### Development Setup
+
 ```bash
 # Install development dependencies
 poetry install --with dev
